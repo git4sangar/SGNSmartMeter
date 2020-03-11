@@ -47,7 +47,7 @@ void MessageHandler:: updateSoftware(std::string strPkt) {
         try {
             jsRoot.validateJSONAndGetValue("ulr", strUrl);
             HttpClient *pHttpClient = HttpClient::getInstance(this);
-            std::cout << "Message Handler: Triggering software update"
+            std::cout << "Message Handler: Triggering software update" << std::endl;
             pHttpClient->pushToQ(strUrl);
         } catch(JsonException &jed) {
             std::cout << jed.what() << std::endl;

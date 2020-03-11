@@ -15,6 +15,14 @@
 #include <openssl/pem.h>
 #include <openssl/rc4.h>
 #include <openssl/evp.h>
+#include <string.h>
+#include <stdlib.h>
+#include <sys/socket.h>
+#include <errno.h>
+#include <netdb.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <ifaddrs.h>
 
 #include "JsonFactory.h"
 #include "JsonException.h"
@@ -28,7 +36,8 @@
 #define HTTP_CLIENT_THREAD_READY    (1003)
 #define APP_NOTIFY_SUBSCRIBE_RESP   (1004)
 
-#define ENCRYPT_KEY     "TechnoSpurs"
+#define ENCRYPT_KEY     "01234567890123456789012345678901"
+#define ENCRYPT_SALT    "0123456789012345"
 
 #define ONE_KB  (1024)
 #define ONE_MB  (1024 * 1024)
@@ -73,13 +82,15 @@ public:
 
 class Config {
     Config();
-    EVP_CIPHER_CTX keyEncrypt, keyDecrypt;
+    unsigned char *encrypt_key;     // 256 bit key
+    unsigned char *encrypt_salt;    // 128 bit IV
     static Config *pConfig;
     std::string strXmppDetails, strCurVersions;
     std::vector<Version> curVersions;
     XmppDetails xmpp_details;
 
 public:
+    virtual ~Config();
     static Config *getInstance();
     bool readEncryptedFile(std::string strFileName, std::string &strContent);
     bool parseXmppDetails();

@@ -50,8 +50,10 @@ public:
                         EVP_CIPHER_CTX *e_ctx,
                         EVP_CIPHER_CTX *d_ctx);
     static std::string getHostToIp(std::string strHost);
-    static unsigned char *aesEncrypt(EVP_CIPHER_CTX *e, unsigned char *plaintext, int *len);
-    static unsigned char *aesDecrypt(EVP_CIPHER_CTX *e, unsigned char *ciphertext, int *len);
+    static int aesEncrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
+                          unsigned char *iv, unsigned char *ciphertext);
+    static int aesDecrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
+                          unsigned char *iv, unsigned char *plaintext);
     static in_addr_t getIpv4BroadcastIpOfEthIF();
     static in_addr_t getIpv4IpOfEthIF();
     static int sendUDPPacket(in_addr_t toIp, int iPort, std::string strPayload, unsigned char isBroadCast = 0);

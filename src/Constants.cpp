@@ -17,9 +17,13 @@
 Config *Config::pConfig = NULL;
 
 Config::Config() {
-    unsigned int salt[] = {12345, 54321};
-    int iRet = Utils::aesInit((unsigned char *)ENCRYPT_KEY, strlen(ENCRYPT_KEY),
-                                    (unsigned char *)&salt, &keyEncrypt, &keyDecrypt);
+    encrypt_key     = (unsigned char *) strdup(ENCRYPT_KEY);  // 256 bit key
+    encrypt_salt    = (unsigned char *) strdup(ENCRYPT_SALT); // 128 bit IV
+}
+
+Config::~Config() {
+    if(encrypt_key)     free(encrypt_key);
+    if(encrypt_salt)    free(encrypt_salt);
 }
 
 Config *Config::getInstance() {
@@ -31,9 +35,9 @@ Config *Config::getInstance() {
 
 bool Config::readEncryptedFile(std::string strFileName, std::string &strContent) {
     FILE *fp = NULL;
-    unsigned char *file_content    = NULL;
-    int cntnt_length = 0;
-    int iRetryCount = 0;
+    unsigned char *cipher_text  = NULL;
+    unsigned char *plain_text   = NULL;
+    int cipher_len = 0, iRetryCount = 0;
     bool bRet       = false;
 
     std::string config_file = std::string(TECHNO_SPURS_ROOT_PATH) + strFileName;
@@ -46,18 +50,19 @@ bool Config::readEncryptedFile(std::string strFileName, std::string &strContent)
     }
 
     if(NULL != fp) {
-        file_content    = new char[MAX_CFG_FILE_SIZE];
-        cntnt_length    = fread(file_content, 1, MAX_CFG_FILE_SIZE, fp);
+        cipher_text = (unsigned char *) malloc(MAX_CFG_FILE_SIZE);
+        plain_text  = (unsigned char *) malloc(MAX_CFG_FILE_SIZE);
+        cipher_len  = fread(cipher_text, 1, MAX_CFG_FILE_SIZE, fp);
         fclose(fp);
 
         //  Decrypt
-        char *pPlain    = Utils::aesDecrypt(&keyDecrypt, file_content, &cntnt_length);
-        if(0 < cntnt_length) {
-            strContent  = std::string(pPlain);
-            bRet        = true;
-            free(pPlain);
-        }
-        delete[] file_content;
+        int plain_len   = Utils::aesDecrypt(cipher_text, cipher_len, encrypt_key, encrypt_salt, plain_text);
+        plain_text[plain_len]   = '\0';
+        strContent  = std::string(reinterpret_cast<char *>(plain_text));
+
+        free(cipher_text);
+        free(plain_text);
+        bRet = true;
     }
 
     return bRet;
@@ -130,7 +135,6 @@ bool Config::parseCurVersions() {
             procVer.parseFromJsonFactory(jsProc);
             curVersions.push_back(procVer);
         }
-
     } catch(JsonException &jed) {
         std::cout << jed.what() << std::endl;
     }

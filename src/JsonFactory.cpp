@@ -24,7 +24,7 @@ JsonFactory::JsonFactory() {
     iCurPkt     = 0;
 }
 
-JsonFactory::JsonFactory(JsonFactory &je) {
+JsonFactory::JsonFactory(const JsonFactory &je) {
     pJRoot      = je.pJRoot;
     iNoOfPkts   = je.iNoOfPkts;
     iCurPkt     = je.iCurPkt;
@@ -83,56 +83,6 @@ json_t *JsonFactory::getRoot() {
     return pJRoot;
 }
 
-unsigned char JsonFactory::isMultiPktJson(string strJson) {
-    json_error_t error = {0};
-    unsigned int iLoop = 0, iRet = 0, iNewPkts = 0;
-    stack<char> braces;
-    json_t *pTemp = NULL, *pFirst = NULL;
-    stringstream ss;
-    char ch, isInQuotes = 0;
-    vector<json_t *> newVector;
-
-    /* keep pushing the '{' braces until a '}' is got.
-     * If so, then pop and check if stack is empty.
-     * When stack is empty that is when one full json packet is got
-     */
-    unsigned int iLen   = strJson.length();
-    for(iLoop = 0, isInQuotes = 0; iLoop < iLen; iLoop++) {
-        ch = strJson.at(iLoop);
-        ss << ch;
-        if('"' == ch && (0 == iLoop || strJson.at(iLoop-1) != '\\')) {
-            isInQuotes = 1 - isInQuotes;
-        }
-        if(!isInQuotes) {
-            if('{' == ch) {
-                braces.push('{');
-            } else if('}' == ch) {
-                braces.pop();
-                if(0 == braces.size()) {
-                    pTemp = json_loads(ss.str().c_str(), 0, &error);
-                    if(pTemp) {
-                        newVector.push_back(pTemp);
-                        iNewPkts++;
-                        pFirst  = (pFirst) ? pFirst : pTemp;
-                        iRet = 1;
-                    }
-                    ss.str("");
-                }
-            }
-        }
-    }
-
-    //  If we are setting a string to existing valid packet then this is will execute
-    if(iRet) {
-        clear();
-        pJRoot      = pFirst;
-        pJRoots     = newVector;
-        iCurPkt     = 0;
-        iNoOfPkts   = iNewPkts;
-    }
-    return iRet;
-}
-
 int JsonFactory::getArraySize(json_t *jsArrayObj) {
     if(json_is_array(jsArrayObj)) {
         return json_array_size(jsArrayObj);
@@ -140,11 +90,11 @@ int JsonFactory::getArraySize(json_t *jsArrayObj) {
     return 0;
 }
 
-JsonFactory JsonFactory::getObjAt(json_t* &jsArrayObj, int iIndex) throw (JsonException) {
+JsonFactory JsonFactory::getObjAt(json_t* jsArrayObj, int iIndex) throw (JsonException) {
     JsonFactory jsRoot;
     json_t *pTemp = NULL;
 
-    if(getArraySize(jsArrayObj) > iIndex) {
+    if(getArraySize(jsArrayObj) < iIndex) {
         throw JsonException("&& JsonFactory: Index out of bounds");
     }
     pTemp   = json_array_get(jsArrayObj, iIndex);
@@ -324,9 +274,58 @@ void JsonFactory::validateJSONAndGetValue(string key, json_t* &val, json_t *pJOb
         throw JsonException("&& JsonFactory: Key \"" + key + "\" not found");
     }
     int iType   = json_typeof(pJsonObj);
-    if(iType != JSON_OBJECT) {
+    if(iType != JSON_OBJECT && iType != JSON_ARRAY) {
         throw JsonException("&& JsonFactory: JSON data type for key " + key + " mismatch");
     }
     val = pJsonObj;
 }
 
+unsigned char JsonFactory::isMultiPktJson(string strJson) {
+    json_error_t error = {0};
+    unsigned int iLoop = 0, iRet = 0, iNewPkts = 0;
+    stack<char> braces;
+    json_t *pTemp = NULL, *pFirst = NULL;
+    stringstream ss;
+    char ch, isInQuotes = 0;
+    vector<json_t *> newVector;
+
+    /* keep pushing the '{' braces until a '}' is got.
+     * If so, then pop and check if stack is empty.
+     * When stack is empty that is when one full json packet is got
+     */
+    unsigned int iLen   = strJson.length();
+    for(iLoop = 0, isInQuotes = 0; iLoop < iLen; iLoop++) {
+        ch = strJson.at(iLoop);
+        ss << ch;
+        if('"' == ch && (0 == iLoop || strJson.at(iLoop-1) != '\\')) {
+            isInQuotes = 1 - isInQuotes;
+        }
+        if(!isInQuotes) {
+            if('{' == ch) {
+                braces.push('{');
+            } else if('}' == ch) {
+                braces.pop();
+                if(0 == braces.size()) {
+                    pTemp = json_loads(ss.str().c_str(), 0, &error);
+                    if(pTemp) {
+                        newVector.push_back(pTemp);
+                        iNewPkts++;
+                        pFirst  = (pFirst) ? pFirst : pTemp;
+                        iRet = 1;
+                    }
+                    ss.str("");
+                }
+            }
+        }
+    }
+
+    //  If we are setting a string to existing valid packet then this is will execute
+    if(iRet) {
+        clear();
+        pJRoot      = pFirst;
+        pJRoots     = newVector;
+        iCurPkt     = 0;
+        iNoOfPkts   = iNewPkts;
+    }
+    return iRet;
+}

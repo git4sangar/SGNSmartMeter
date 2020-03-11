@@ -27,7 +27,7 @@ class JsonFactory {
 
 public:
     JsonFactory();
-    JsonFactory(JsonFactory &je);
+    JsonFactory(const JsonFactory &je);
     virtual ~JsonFactory();
 
     void gotoFirst();
@@ -48,7 +48,7 @@ public:
 
     bool isArray(json_t *jsObj) { return json_is_array(jsObj); }
     int getArraySize(json_t *jsArrayObj);
-    JsonFactory getObjAt(json_t* &jsArrayObj, int iIndex) throw (JsonException) ;
+    JsonFactory getObjAt(json_t* jsArrayObj, int iIndex) throw (JsonException) ;
 
     void setJsonString(string jsonStr) throw(JsonException);
     void addStringValue(string strKey, string strVal);
