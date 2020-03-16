@@ -21,27 +21,12 @@ class JsonFactory {
     //  If the new object decrefs this pointer, the object invoked this will be holding an invalid pointer
     //  If that too tries to decrefs, BANG...
     json_t *pJRoot;
-    int iNoOfPkts;
-    int iCurPkt;
-    vector<json_t *> pJRoots;
 
 public:
     JsonFactory();
     JsonFactory(const JsonFactory &je);
     virtual ~JsonFactory();
 
-    void gotoFirst();
-    void gotoLast();
-    unsigned char isEnd();
-    unsigned char isMultiPktJson(string strJson);
-
-    void operator++();
-    void operator++(int);
-    void increment();
-
-    void operator--();
-    void operator--(int);
-    void decrement();
 
     json_t *getRoot();
     void clear();
@@ -54,7 +39,9 @@ public:
     void addStringValue(string strKey, string strVal);
     void addIntValue(string strKey, int iVal);
     void addJsonObj(string strKey, JsonFactory jsObj);
+
     string getJsonString() throw(JsonException);
+
     void validateJSONAndGetValue(string key, string &val, json_t *pJObj = NULL) throw(JsonException);
     void validateJSONAndGetValue(string key, int &val, json_t *pJObj = NULL) throw(JsonException);
     void validateJSONAndGetValue(string key, json_t* &val, json_t *pJObj = NULL) throw(JsonException);

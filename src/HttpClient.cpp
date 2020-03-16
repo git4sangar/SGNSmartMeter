@@ -66,6 +66,8 @@ std::string HttpClient :: readFromQ() {
 
 void *HttpClient :: genericCurlThread(void *pHttpClient) {
     std::string strUrl;
+    std::string strCAFile   = std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_CERT_FILE);
+    std::string dwldFile    = std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_DOWNLOAD_FILE);
     long respCode;
     FILE    *write_data;
     CURLcode res = CURLE_OK;
@@ -79,20 +81,25 @@ void *HttpClient :: genericCurlThread(void *pHttpClient) {
 
         CURL *curl      = curl_easy_init();
         if(curl) {
+			/*curl_easy_setopt(curl, CURLOPT_PROXY, "http://proxyvipfmcc.nb.ford.com");
+			curl_easy_setopt(curl, CURLOPT_PROXY, "https://proxyvipfmcc.nb.ford.com");
+			curl_easy_setopt(curl, CURLOPT_PROXY, "ftp://proxyvipfmcc.nb.ford.com");
+			curl_easy_setopt(curl, CURLOPT_PROXYPORT, 83);*/
+
             curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 0L);
-            curl_easy_setopt(curl, CURLOPT_URL, strUrl);
+            curl_easy_setopt(curl, CURLOPT_URL, strUrl.c_str());
 
             //  Set the header
             headers = curl_slist_append(headers, "Content-Type: application/zip");
             curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
-                //  For verifying server
+            //  For verifying server
             curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1L);
             curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L);
-            curl_easy_setopt(curl, CURLOPT_CAINFO, "/etc/tls/ca-bundle.pem");
+            curl_easy_setopt(curl, CURLOPT_CAINFO, strCAFile.c_str());
 
             curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_function);
-            write_data  = fopen("download.zip", "wb");
+            write_data  = fopen(dwldFile.c_str(), "wb");
             curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)write_data);
 
             res = curl_easy_perform(curl);

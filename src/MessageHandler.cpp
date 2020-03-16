@@ -16,6 +16,7 @@
 #include "JsonException.h"
 #include "JsonFactory.h"
 #include "HttpClient.h"
+#include "FileHandler.h"
 
 MessageHandler *MessageHandler::pMsgH;
 
@@ -160,10 +161,12 @@ void *MessageHandler::run(void *pUserData) {
 
 
 void MessageHandler::onDownloadSuccess(int iResp) {
-    //  Unzip downloaded file
-    //  Update Current Version in versions.bin
+    std::string dwldFile    = std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_DOWNLOAD_FILE);
+    std::string unzipCmd    = std::string("unzip ") + dwldFile;
+    system(unzipCmd.c_str());
     //  Reboot system
 }
+
 void MessageHandler::onDownloadFailure(int iResp) {
     //  Inform server jid regarding failure
 }

@@ -41,11 +41,19 @@
 
 #define ONE_KB  (1024)
 #define ONE_MB  (1024 * 1024)
-#define CONFIG_FILE_WITH_PATH       "/home/tstone10/sgn/bkup/private/projs/SGNBarc/config.txt"
 
+//	Let all paths be suffixed with "/"
+//	Treat it as folders otherwise
 #define TECHNO_SPURS_ROOT_PATH      "/home/pi/technospurs/"
-#define TECHNO_SPURS_CFG_FILE       "config_file.bin"
-#define TECHNO_SPURS_VERSIONS       "versions.bin"
+#define TECHNO_SPURS_CFG_FILE       "cfg/config_file.bin"
+#define TECHNO_SPURS_VERSIONS       "wdog/versions.bin"
+#define TECHNO_SPURS_CERT_FILE      "certs/cacert.pem"
+#define TECHNO_SPURS_DOWNLOAD_FILE  "downloads/new_update.zip"
+#define TECHNO_SPURS_DOWNLOAD_PATH	"downloads/"
+#define TECHNO_SPURS_TEMP_DWLD_PATH	"downloads/SmartMeter"
+#define TECHNO_SPURS_APP_FOLDER		"SmartMeter"
+#define TECHNO_SPURS_LOG_PATH		"logs/"
+
 #define MAX_CFG_FILE_SIZE           ONE_MB
 #define MAX_RETRY_COUNT             (3)
 

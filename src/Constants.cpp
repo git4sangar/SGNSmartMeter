@@ -68,6 +68,7 @@ bool Config::readEncryptedFile(std::string strFileName, std::string &strContent)
     return bRet;
 }
 
+
 /*{
   "xmpp_client" : {
     "client_jid" : "altimeter_0001@im.koderoot.net",
