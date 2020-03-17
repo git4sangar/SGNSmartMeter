@@ -11,17 +11,38 @@
 #include <string.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include "Constants.h"
 #include "JabberClient.h"
-#include "XmppRespHandler.h"
+#include "MessageHandler.h"
+#include "HttpClient.h"
+#include "FileHandler.h"
 
 int main() {
+
+	//	First and foremost, wait for 2 mins.
+	//	Let the environment get settled & let all the Smartmeter processes get up & running
+	//	sleep(WAIT_TIME_SECs);
+
     JabberClient *pJabberClient;
     pJabberClient   = JabberClient::getJabberClient();
 
-    XmppRespHandler *pXmppRespHndlr   = new XmppRespHandler();
-    pJabberClient->subscribeNotification(pXmppRespHndlr);
+    //	Start all the threads by getting the instances
+    MessageHandler *pMsgH	= MessageHandler::getInstance();
+    pJabberClient->subscribeNotification(pMsgH);
 
-    pJabberClient->connect("", "altimeter_0001@im.koderoot.net", "abcd1234");
-    pJabberClient->startXmpp();
+    HttpClient *pHttpClient	= HttpClient::getInstance();
+    pHttpClient->subscribeListener(pMsgH);
+
+    FileHandler::getInstance();
+
+    Config *pConfig	= Config::getInstance();
+    pConfig->parseCurVersions();
+
+    if(pConfig->parseXmppDetails()) {
+    	XmppDetails xmppDetails	= pConfig->getXmppDetails();
+    	pJabberClient->connect("", xmppDetails.getClientJid().c_str(), xmppDetails.getClientPwd().c_str());
+    	pJabberClient->startXmpp();
+    }
+
     return 0;
 }

@@ -41,7 +41,6 @@ public:
     //static map<string, int> mapFeatureToIds;
 
     static int getUniqueRunningNo();
-    static ReqPacket *getReqPacketForReservedId(int iReqId);
     static std::string calculateSHA256String(std::string &data);
     static std::string get4BitRShiftDateInMDYYYY();
     static int aesInit(unsigned char *key_data,

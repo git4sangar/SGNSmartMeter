@@ -14,3 +14,62 @@ IP : 127.0.0.1
 	}
 }
 curl -X POST "http://ec2-3-135-62-120.us-east-2.compute.amazonaws.com:3000/api/panelmap" -H "accept: application/json" -H "Content-Type: application/json" -d "{ \"panel_id\": \"string\"}"
+
+Provisioning a new RPi
+(01) Install the Raspbian Buster Lite on SD Card
+
+(02) Change the Pi password as follows
+        (a) openssl passwd -1 -salt <salt> <passwd>
+                        eg: openssl passwd -1 -salt techno Welcome123$
+        (b) note down the output
+        (c) sudo vim /path/to/sdcard/etc/shadow
+        (d) locate the line that starts with pi and replace the text between the first and second ":" with the above output
+        (e) save the file
+
+(03) Copy the libraries required for XMPP Client & Watch dog server to /path/to/sdcard/usr/local/lib
+(04) Copy the packages required for python to appropriate /path/to/sdcard/home/pi/.local/lib/python3.5/site-packages
+(05) Create the following folders
+                (a) /path/to/sdcard/home/pi/technospurs/certs/
+                (b) /path/to/sdcard/home/pi/technospurs/cfg
+                (c) /path/to/sdcard/home/pi/technospurs/wdog
+                (d) /path/to/sdcard/home/pi/technospurs/downloads
+                (e) /path/to/sdcard/home/pi/technospurs/SmartMeter
+                (f) /path/to/sdcard/home/pi/technospurs/bin
+                (g) /path/to/sdcard/home/pi/technospurs/logs
+
+(06) copy the certificates to /path/to/sdcard/home/pi/technospurs/certs/cacert.pem => I will hardcode this. If required, we can replace this file through software update
+(07) copy the python code to /path/to/sdcard/home/pi/technospurs/ (folder name is Smartmeter right?)
+(08) copy the xmpp client & watch dog server code to /path/to/sdcard/home/pi/technospurs/bin
+(09) encrypt the xmpp client credentials (as follows), encrypt it & save as config_file.bin and copy it to /path/to/sdcard/home/pi/technospurs/cfg
+                        {
+                            "xmpp_client" : {
+                            "client_jid"		: "altimeter_0001@im.koderoot.net",
+                            "client_password"	: "abcd1234",
+                            "cpanel_jid"		: "technospurs@im.koderoot.net"
+                        }
+                I will provide a console based tool for generating the encryption
+
+				Additional Info
+				===============
+					(a) the file name config_file.bin is important
+					(b) 256 bit key used
+					(c) Symmetric Key: "01234567890123456789012345678901"
+					(d) Salt: "0123456789012345"
+
+(10) A xmpp message to trigger a download shall look like this
+	{
+		"command":"smart_meter_update",
+		"url":"https://technospurs.com/imageSets.zip",
+		"processes" :
+        [
+          {"name" : "process1","version":{"major":1, "minor":0, "patch":1}},
+          {"name" : "process2","version":{"major":1, "minor":0, "patch":1}},
+          {"name" : "process3","version":{"major":1, "minor":0, "patch":1}}
+        ]
+	}
+	Additional Info
+	===============
+	on unzipping, it shall yield "SmartMeter" folder with necessary sub folders
+			
+			
+

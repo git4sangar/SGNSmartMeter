@@ -33,26 +33,24 @@ Config *Config::getInstance() {
     return pConfig;
 }
 
-bool Config::readEncryptedFile(std::string strFileName, std::string &strContent) {
+bool Config::readEncryptedFile(std::string file_name, std::string &strContent) {
     FILE *fp = NULL;
     unsigned char *cipher_text  = NULL;
     unsigned char *plain_text   = NULL;
     int cipher_len = 0, iRetryCount = 0;
     bool bRet       = false;
 
-    std::string config_file = std::string(TECHNO_SPURS_ROOT_PATH) + strFileName;
-
     fp = NULL;
     while(iRetryCount < MAX_RETRY_COUNT && NULL == fp) {
-        fp = fopen(config_file.c_str(), "rb");
+        fp = fopen(file_name.c_str(), "rb");
         iRetryCount++;
         sleep(1);
     }
 
     if(NULL != fp) {
-        cipher_text = (unsigned char *) malloc(MAX_CFG_FILE_SIZE);
-        plain_text  = (unsigned char *) malloc(MAX_CFG_FILE_SIZE);
-        cipher_len  = fread(cipher_text, 1, MAX_CFG_FILE_SIZE, fp);
+        cipher_text = (unsigned char *) malloc(MAX_FILE_SIZE);
+        plain_text  = (unsigned char *) malloc(MAX_FILE_SIZE);
+        cipher_len  = fread(cipher_text, 1, MAX_FILE_SIZE, fp);
         fclose(fp);
 
         //  Decrypt
@@ -73,7 +71,7 @@ bool Config::readEncryptedFile(std::string strFileName, std::string &strContent)
   "xmpp_client" : {
     "client_jid" : "altimeter_0001@im.koderoot.net",
     "client_password" : "abcd1234",
-    "server_jid" : "technospurs@im.koderoot.net"
+    "cpanel_jid" : "technospurs@im.koderoot.net"
   }
 }*/
 bool Config::parseXmppDetails() {
@@ -81,23 +79,24 @@ bool Config::parseXmppDetails() {
     json_t      *jsXmpp;
     bool        bRet = false;
 
-    if(readEncryptedFile(TECHNO_SPURS_CFG_FILE, strXmppDetails)) {
+    std::string strCfgFile	= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_CFG_FILE);
+    if(!readEncryptedFile(strCfgFile, strXmppDetails)) {
         std::cout << "Failed reading XMPP Configurations" << std::endl;
         return false;
     }
 
     if(!strXmppDetails.empty()) {
-        std::string client_jid, client_pwd, server_jid;
+        std::string client_jid, client_pwd, cpanel_jid;
         try {
             jsRoot.setJsonString(strXmppDetails);
             jsRoot.validateJSONAndGetValue("xmpp_client", jsXmpp);
             jsRoot.validateJSONAndGetValue("client_jid", client_jid, jsXmpp);
             jsRoot.validateJSONAndGetValue("client_password", client_pwd, jsXmpp);
-            jsRoot.validateJSONAndGetValue("server_jid", server_jid, jsXmpp);
+            jsRoot.validateJSONAndGetValue("cpanel_jid", cpanel_jid, jsXmpp);
 
             xmpp_details.setClientJid(client_jid);
             xmpp_details.setClientPwd(client_pwd);
-            xmpp_details.setServerJid(server_jid);
+            xmpp_details.setCPanelJid(cpanel_jid);
             bRet = true;
         } catch(JsonException &jed) {
             std::cout << "Initialization: Config json parsing failed" << std::endl;
@@ -120,8 +119,8 @@ bool Config::parseXmppDetails() {
 bool Config::parseCurVersions() {
     std::string strProcName;
     Version procVer;
-
-    if(readEncryptedFile(TECHNO_SPURS_VERSIONS, strCurVersions)) {
+    std::string strVerFile	= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_VERSIONS);
+    if(!readEncryptedFile(strVerFile, strCurVersions)) {
         std::cout << "Failed reading Versions" << std::endl;
         return false;
     }
@@ -179,11 +178,9 @@ bool Version::operator == (const Version &other) {
 
 /*  { "name" : "process_name", "version": {"major":1,"minor":0,"patch":0} } */
 void Version::parseFromJsonFactory(JsonFactory jsRoot) {
-    std::string strProcName;
     json_t *jsVer;
     try {
-            jsRoot.validateJSONAndGetValue("name", strProcName);
-            setProcName(strProcName);
+            jsRoot.validateJSONAndGetValue("name", procName);
             jsRoot.validateJSONAndGetValue("version", jsVer);
             jsRoot.validateJSONAndGetValue("major", mjr, jsVer);
             jsRoot.validateJSONAndGetValue("minor", mnr, jsVer);
@@ -196,15 +193,13 @@ void Version::parseFromJsonFactory(JsonFactory jsRoot) {
 
 /*  { "name" : "process_name", "version": {"major":1,"minor":0,"patch":0} } */
 void Version::parseFromString(std::string strJson) {
-    std::string strProcName;
     JsonFactory jsRoot;
     json_t *jsVer;
 
     if(!strJson.empty()) {
         try {
                 jsRoot.setJsonString(strJson);
-                jsRoot.validateJSONAndGetValue("name", strProcName);
-                setProcName(strProcName);
+                jsRoot.validateJSONAndGetValue("name", procName);
                 jsRoot.validateJSONAndGetValue("version", jsVer);
                 jsRoot.validateJSONAndGetValue("major", mjr, jsVer);
                 jsRoot.validateJSONAndGetValue("minor", mnr, jsVer);

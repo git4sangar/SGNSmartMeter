@@ -27,7 +27,7 @@
 #include <ifaddrs.h>
 
 pthread_mutex_t Utils::mtxRunningNo = PTHREAD_MUTEX_INITIALIZER;
-int Utils::iRunningNo = MAX_RESERVED_REQ_IDS;
+int Utils::iRunningNo = 1001;
 
 int Utils::getUniqueRunningNo() {
     int iRet = 0;
@@ -35,25 +35,6 @@ int Utils::getUniqueRunningNo() {
     iRet = ++iRunningNo;
     pthread_mutex_unlock(&mtxRunningNo);
     return iRet;
-}
-
-
-ReqPacket *Utils::getReqPacketForReservedId(int iReqId) {
-    if(MAX_RESERVED_REQ_IDS < iReqId) {
-        return NULL;
-    }
-
-    ReqPacket *pReq = NULL;
-    switch(iReqId) {
-    case REQ_ID_HTTP_CLIENT_THREAD_READY:
-        pReq            = new ReqPacket();
-        pReq->iReqId    = REQ_ID_HTTP_CLIENT_THREAD_READY;
-        pReq->iType     = HTTP_CLIENT_THREAD_READY;
-        pReq->pObject   = NULL;
-        pReq->isAlive   = 0;
-        break;
-    }
-    return pReq;
 }
 
 std::string Utils::calculateSHA256String(std::string &data) {

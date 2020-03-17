@@ -20,7 +20,9 @@ FileHandler *FileHandler::pFileHandler = NULL;
 
 
 FileHandler :: FileHandler() {
-
+	pthread_t file_handler_thread;
+	pthread_create(&file_handler_thread, NULL, &run, this);
+	pthread_detach(file_handler_thread);
 }
 
 FileHandler :: ~FileHandler() {
@@ -179,7 +181,7 @@ void *FileHandler :: run(void *pUserData) {
 			pThis->rmdir(app_path);
 
 			//	extract the downloaded file to app path
-			chdir(app_path.c_str());
+			chdir(TECHNO_SPURS_ROOT_PATH);
 			if(pThis->extract(strFileName)) {
 				//	Send a success message, probably with a version
 			}

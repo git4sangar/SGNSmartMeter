@@ -23,9 +23,12 @@ MessageHandler *MessageHandler::pMsgH;
 MessageHandler::MessageHandler() {
     qLock   = PTHREAD_MUTEX_INITIALIZER;
     qCond   = PTHREAD_COND_INITIALIZER;
+    pthread_t msg_handler_thread;
+    pthread_create(&msg_handler_thread, NULL, &run, this);
+    pthread_detach(msg_handler_thread);
 }
 
-void MessageHandler:: updateSoftware(std::string strPkt) {
+void MessageHandler:: smartMeterUpdate(std::string strPkt) {
     std::vector<Version> newVersions;
     bool isUpdateRequired = false;
 
@@ -46,8 +49,8 @@ void MessageHandler:: updateSoftware(std::string strPkt) {
         jsRoot.setJsonString(strPkt);
         std::string strUrl;
         try {
-            jsRoot.validateJSONAndGetValue("ulr", strUrl);
-            HttpClient *pHttpClient = HttpClient::getInstance(this);
+            jsRoot.validateJSONAndGetValue("url", strUrl);
+            HttpClient *pHttpClient = HttpClient::getInstance();
             std::cout << "Message Handler: Triggering software update" << std::endl;
             pHttpClient->pushToQ(strUrl);
         } catch(JsonException &jed) {
@@ -59,7 +62,7 @@ void MessageHandler:: updateSoftware(std::string strPkt) {
 }
 
 /*  {
- *      "command":"software_update",
+ *      "command":"smart_meter_update",
  *      "url":"https://www.somedomain.ext/path/to/zip/file.zip",
  *      "processes" :
         [
@@ -109,6 +112,19 @@ MessageHandler *MessageHandler::getInstance() {
     return pMsgH;
 }
 
+void MessageHandler::onXmppConnect() {
+    std::cout << "Xmpp connected \n" << std::endl;
+}
+
+void MessageHandler::onXmppDisconnect(int iErr) {
+    std::cout << "Xmpp disconnected \n" << std::endl;
+}
+
+void MessageHandler::onXmppMessage(std::string strMsg, std::string strFrom) {
+    pushToQ(strMsg);
+}
+
+
 void MessageHandler::pushToQ(std::string strMsg) {
     pthread_mutex_lock(&qLock);
     msgQ.push(strMsg);
@@ -136,8 +152,8 @@ void *MessageHandler::run(void *pUserData) {
             jsRoot.validateJSONAndGetValue("command", strCmd);
             int iCmd    = pThis->msgStruct.getCommandVal(strCmd);
             switch(iCmd) {
-                case UPDATE_SOFTWARE:
-                    pThis->updateSoftware(strCmd);
+                case SMART_METER_UPDATE:
+                    pThis->smartMeterUpdate(strMsg);
                     break;
 
                 case UPLOAD_LOGS:
@@ -159,13 +175,10 @@ void *MessageHandler::run(void *pUserData) {
     return NULL;
 }
 
-
 void MessageHandler::onDownloadSuccess(int iResp) {
-    std::string dwldFile    = std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_DOWNLOAD_FILE);
-    std::string unzipCmd    = std::string("unzip ") + dwldFile;
-    system(unzipCmd.c_str());
-    //  Reboot system
-}
+    std::string dwldFile	= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_DOWNLOAD_FILE);
+    FileHandler *pFH		= FileHandler::getInstance();
+    pFH->pushToQ(dwldFile);}
 
 void MessageHandler::onDownloadFailure(int iResp) {
     //  Inform server jid regarding failure

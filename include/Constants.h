@@ -28,23 +28,17 @@
 #include "JsonException.h"
 #include "Utils.h"
 
-#define MAX_RESERVED_REQ_IDS                (100)
-#define REQ_ID_HTTP_CLIENT_THREAD_READY     (2)
-
-#define MAX_CHAR_BUFFER_LEN         (2048)
-#define LOGIN_CREDENTIALS           (1001)
-#define HTTP_CLIENT_THREAD_READY    (1003)
-#define APP_NOTIFY_SUBSCRIBE_RESP   (1004)
-
 #define ENCRYPT_KEY     "01234567890123456789012345678901"
 #define ENCRYPT_SALT    "0123456789012345"
 
-#define ONE_KB  (1024)
-#define ONE_MB  (1024 * 1024)
+#define ONE_KB  		(1024)
+#define ONE_MB  		(1024 * 1024)
+#define WAIT_TIME_SECs	(2 * 60)
 
 //	Let all paths be suffixed with "/"
 //	Treat it as folders otherwise
-#define TECHNO_SPURS_ROOT_PATH      "/home/pi/technospurs/"
+//#define TECHNO_SPURS_ROOT_PATH      "/home/pi/technospurs/"
+#define TECHNO_SPURS_ROOT_PATH      "/home/tstone10/sgn/bkup/private/projs/SGNBarc/technospurs/"
 #define TECHNO_SPURS_CFG_FILE       "cfg/config_file.bin"
 #define TECHNO_SPURS_VERSIONS       "wdog/versions.bin"
 #define TECHNO_SPURS_CERT_FILE      "certs/cacert.pem"
@@ -54,21 +48,21 @@
 #define TECHNO_SPURS_APP_FOLDER		"SmartMeter"
 #define TECHNO_SPURS_LOG_PATH		"logs/"
 
-#define MAX_CFG_FILE_SIZE           ONE_MB
+#define MAX_FILE_SIZE           ONE_MB
 #define MAX_RETRY_COUNT             (3)
 
 class XmppDetails {
     std::string client_jid,
                 client_pwd,
-                server_jid;
+                cpanel_jid;
 public:
     void setClientJid(std::string _client_jid) { client_jid = _client_jid;}
     void setClientPwd(std::string _client_pwd) { client_pwd = _client_pwd;}
-    void setServerJid(std::string _server_jid) { server_jid = _server_jid;}
+    void setCPanelJid(std::string _server_jid) { cpanel_jid = _server_jid;}
 
     std::string getClientJid() {return client_jid;}
     std::string getClientPwd() {return client_pwd;}
-    std::string getServerJid() {return server_jid;}
+    std::string getCPanelJid() {return cpanel_jid;}
 };
 
 class Version {

@@ -12,11 +12,15 @@
 #include <map>
 #include <array>
 
-#define UPDATE_SOFTWARE     (0)
-#define UPLOAD_LOGS         (1)
-#define ENABLE_LOG_LEVEL    (2)
-#define REBOOT_SYSTEM       (3)
-#define MAX_COMMANDS        (4)
+#define SMART_METER_UPDATE		(0)
+#define PYTHON_PACKAGE_UPDATE	(1)
+#define C_LIBRARY_UPDATE		(2)
+#define WATCH_DOG_UPDATE		(3)
+#define CA_CERT_FILE_UPDATE		(4)
+#define UPLOAD_LOGS         	(5)
+#define ENABLE_LOG_LEVEL    	(6)
+#define REBOOT_SYSTEM       	(7)
+#define MAX_COMMANDS        	(8)
 
 class MessageStructure {
     std::map<std::string, int> headers;

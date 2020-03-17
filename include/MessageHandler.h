@@ -14,8 +14,9 @@
 #include "Constants.h"
 #include "HttpResponse.h"
 #include "MessageStructure.h"
+#include "JabberResponse.h"
 
-class MessageHandler : public HttpResponse {
+class MessageHandler : public HttpResponse, public JabberResponse {
     std::queue<std::string> msgQ;
     pthread_mutex_t qLock;
     pthread_cond_t qCond;
@@ -29,7 +30,7 @@ public:
     virtual ~MessageHandler();
 
     void pushToQ(std::string msg);
-    void updateSoftware(std::string strPkt);
+    void smartMeterUpdate(std::string strPkt);
     void uploadLogs();
     void enable_log_level();
     void reboot();
@@ -38,8 +39,14 @@ public:
     static MessageHandler *getInstance();
     static void *run(void *pUserData);
 
-    virtual void onDownloadSuccess(int iResp);
-    virtual void onDownloadFailure(int iResp);
+    //	Xmpp message handler
+    void onXmppMessage(std::string strMsg, std::string strFrom);
+    void onXmppConnect();
+    void onXmppDisconnect(int iErr);
+
+    //	Http response handler
+    void onDownloadSuccess(int iResp);
+    void onDownloadFailure(int iResp);
 };
 
 #endif /* MESSAGEHANDLER_H_ */

@@ -17,8 +17,7 @@
 
 HttpClient *HttpClient::pHttpClient = NULL;
 
-HttpClient :: HttpClient(HttpResponse *pObs) {
-    pListener   = pObs;
+HttpClient :: HttpClient() {
     mtxgQ       = PTHREAD_MUTEX_INITIALIZER;
     mtxgCond    = PTHREAD_COND_INITIALIZER;
 
@@ -27,13 +26,13 @@ HttpClient :: HttpClient(HttpResponse *pObs) {
     curl_global_init(CURL_GLOBAL_ALL);
 
     pthread_t tCurThread;
-    pthread_create(&tCurThread, NULL, &genericCurlThread, this);
+    pthread_create(&tCurThread, NULL, &run, this);
     pthread_detach(tCurThread);
 }
 
-HttpClient *HttpClient::getInstance(HttpResponse *pListener) {
+HttpClient *HttpClient::getInstance() {
     if(NULL == pHttpClient) {
-        pHttpClient = new HttpClient(pListener);
+        pHttpClient = new HttpClient();
     }
     return pHttpClient;
 }
@@ -58,13 +57,13 @@ std::string HttpClient :: readFromQ() {
         pthread_cond_wait(&mtxgCond, &mtxgQ);
     }
     strUrl = genericQ.front();
-    std::cout << "&& Got a request for " << strUrl << std::endl;
+    std::cout << "&& Got a request for download: " << strUrl << std::endl;
     genericQ.pop();
     pthread_mutex_unlock(&mtxgQ);
     return strUrl;
 }
 
-void *HttpClient :: genericCurlThread(void *pHttpClient) {
+void *HttpClient :: run(void *pHttpClient) {
     std::string strUrl;
     std::string strCAFile   = std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_CERT_FILE);
     std::string dwldFile    = std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_DOWNLOAD_FILE);
@@ -80,7 +79,7 @@ void *HttpClient :: genericCurlThread(void *pHttpClient) {
         strUrl          = pThis->readFromQ();
 
         CURL *curl      = curl_easy_init();
-        if(curl) {
+        if(curl && pThis->pListener) {
 			/*curl_easy_setopt(curl, CURLOPT_PROXY, "http://proxyvipfmcc.nb.ford.com");
 			curl_easy_setopt(curl, CURLOPT_PROXY, "https://proxyvipfmcc.nb.ford.com");
 			curl_easy_setopt(curl, CURLOPT_PROXY, "ftp://proxyvipfmcc.nb.ford.com");
@@ -103,13 +102,14 @@ void *HttpClient :: genericCurlThread(void *pHttpClient) {
             curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)write_data);
 
             res = curl_easy_perform(curl);
+            if(write_data) fclose(write_data);
+
             CURLcode infoResp = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &respCode);
             if(CURLE_OK == res && CURLE_OK == infoResp && respCode >= 200 && respCode <= 299) {
                 pThis->pListener->onDownloadSuccess(respCode);
             } else {
                 pThis->pListener->onDownloadFailure(respCode);
             }
-            if(write_data) fclose(write_data);
         }
 
         curl_easy_cleanup(curl);
