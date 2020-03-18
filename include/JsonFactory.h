@@ -38,6 +38,7 @@ public:
     void setJsonString(string jsonStr) throw(JsonException);
     void addStringValue(string strKey, string strVal);
     void addIntValue(string strKey, int iVal);
+    void addBoolValue(string strKey, bool bVal);
     void addJsonObj(string strKey, JsonFactory jsObj);
 
     string getJsonString() throw(JsonException);

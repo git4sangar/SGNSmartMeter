@@ -154,7 +154,7 @@ int JabberClient::sendMsgTo(std::string strMsg, std::string toAddress) {
     xmpp_stanza_t *reply = NULL, *body = NULL, *text = NULL;
 
     if(toAddress.empty()) {
-            printf("&& To Address is empty\n");
+    	printf("&& To Address is empty\n");
         return -1;
     }
 

@@ -10,7 +10,6 @@
 
 #include <iostream>
 #include <map>
-#include <array>
 
 #define SMART_METER_UPDATE		(0)
 #define PYTHON_PACKAGE_UPDATE	(1)

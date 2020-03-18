@@ -48,11 +48,15 @@ void MessageHandler:: smartMeterUpdate(std::string strPkt) {
         JsonFactory jsRoot;
         jsRoot.setJsonString(strPkt);
         std::string strUrl;
+        int cmdNo = 0;
         try {
             jsRoot.validateJSONAndGetValue("url", strUrl);
+            jsRoot.validateJSONAndGetValue("command_no", cmdNo);
             HttpClient *pHttpClient = HttpClient::getInstance();
             std::cout << "Message Handler: Triggering software update" << std::endl;
-            pHttpClient->pushToQ(strUrl);
+
+            std::pair<std::string, int> reqPair	= std::make_pair(strUrl, cmdNo);
+            pHttpClient->pushToQ(reqPair);
         } catch(JsonException &jed) {
             std::cout << jed.what() << std::endl;
         }
@@ -175,12 +179,15 @@ void *MessageHandler::run(void *pUserData) {
     return NULL;
 }
 
-void MessageHandler::onDownloadSuccess(int iResp) {
+void MessageHandler::onDownloadSuccess(int iResp, int iCmdNo) {
+	std::pair<std::string, int> reqPair;
     std::string dwldFile	= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_DOWNLOAD_FILE);
     FileHandler *pFH		= FileHandler::getInstance();
-    pFH->pushToQ(dwldFile);}
+    reqPair			= std::make_pair(dwldFile, iCmdNo);
+    pFH->pushToQ(reqPair);
+}
 
-void MessageHandler::onDownloadFailure(int iResp) {
+void MessageHandler::onDownloadFailure(int iResp, int iCmdNo) {
     //  Inform server jid regarding failure
 }
 

@@ -41,29 +41,31 @@ HttpClient :: ~HttpClient() {
     curl_global_cleanup();
 }
 
-void HttpClient :: pushToQ(std::string strUrl) {
+void HttpClient :: pushToQ(std::pair<std::string, int> reqPair) {
     pthread_mutex_lock(&mtxgQ);
-    genericQ.push(strUrl);
+    genericQ.push(reqPair);
     pthread_cond_signal(&mtxgCond);
     pthread_mutex_unlock(&mtxgQ);
 }
 
-
-std::string HttpClient :: readFromQ() {
-    std::string strUrl;
+std::pair<std::string, int> HttpClient :: readFromQ() {
+	std::pair<std::string, int> reqPair;
     pthread_mutex_lock(&mtxgQ);
     if(genericQ.empty()) {
         cout << "&& Waiting for http requests" << endl;
         pthread_cond_wait(&mtxgCond, &mtxgQ);
     }
-    strUrl = genericQ.front();
-    std::cout << "&& Got a request for download: " << strUrl << std::endl;
+    reqPair = genericQ.front();
+    std::cout << "&& Got a request for download: " << reqPair.first << std::endl;
     genericQ.pop();
     pthread_mutex_unlock(&mtxgQ);
-    return strUrl;
+    return reqPair;
 }
 
 void *HttpClient :: run(void *pHttpClient) {
+	std::pair<std::string, int> reqPair;
+	int cmdNo = 0;
+
     std::string strUrl;
     std::string strCAFile   = std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_CERT_FILE);
     std::string dwldFile    = std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_DOWNLOAD_FILE);
@@ -76,7 +78,9 @@ void *HttpClient :: run(void *pHttpClient) {
 
     struct curl_slist* headers = NULL;
     while(1) {
-        strUrl          = pThis->readFromQ();
+    	reqPair	= pThis->readFromQ();
+    	strUrl	= reqPair.first;
+    	cmdNo	= reqPair.second;
 
         CURL *curl      = curl_easy_init();
         if(curl && pThis->pListener) {
@@ -106,9 +110,9 @@ void *HttpClient :: run(void *pHttpClient) {
 
             CURLcode infoResp = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &respCode);
             if(CURLE_OK == res && CURLE_OK == infoResp && respCode >= 200 && respCode <= 299) {
-                pThis->pListener->onDownloadSuccess(respCode);
+                pThis->pListener->onDownloadSuccess(respCode, cmdNo);
             } else {
-                pThis->pListener->onDownloadFailure(respCode);
+                pThis->pListener->onDownloadFailure(respCode, cmdNo);
             }
         }
 

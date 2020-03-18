@@ -23,23 +23,25 @@ int main() {
 	//	Let the environment get settled & let all the Smartmeter processes get up & running
 	//	sleep(WAIT_TIME_SECs);
 
-    JabberClient *pJabberClient;
-    pJabberClient   = JabberClient::getJabberClient();
-
-    //	Start all the threads by getting the instances
-    MessageHandler *pMsgH	= MessageHandler::getInstance();
-    pJabberClient->subscribeNotification(pMsgH);
-
-    HttpClient *pHttpClient	= HttpClient::getInstance();
-    pHttpClient->subscribeListener(pMsgH);
-
-    FileHandler::getInstance();
-
     Config *pConfig	= Config::getInstance();
     pConfig->parseCurVersions();
 
     if(pConfig->parseXmppDetails()) {
     	XmppDetails xmppDetails	= pConfig->getXmppDetails();
+    	MessageHandler *pMsgH	= MessageHandler::getInstance();
+
+    	//	Both Jabber & Http clients are dependent on Message Handler for handling responses
+    	//	So this order
+        JabberClient *pJabberClient   = JabberClient::getJabberClient();
+        pJabberClient->subscribeNotification(pMsgH);
+
+        HttpClient *pHttpClient	= HttpClient::getInstance();
+        pHttpClient->subscribeListener(pMsgH);
+
+        //	File handler uses xmpp details. so launch it finally
+        FileHandler::getInstance();
+
+    	//	Now all set to launch the Jabber client
     	pJabberClient->connect("", xmppDetails.getClientJid().c_str(), xmppDetails.getClientPwd().c_str());
     	pJabberClient->startXmpp();
     }

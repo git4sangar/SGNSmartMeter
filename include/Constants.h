@@ -90,6 +90,7 @@ class Config {
     std::string strXmppDetails, strCurVersions;
     std::vector<Version> curVersions;
     XmppDetails xmpp_details;
+    std::string strUniqId;
 
 public:
     virtual ~Config();
@@ -99,6 +100,7 @@ public:
     bool parseCurVersions();
     Version getVerForProc(std::string strProcName);
 
+    std::string getUniqueId() { return strUniqId; }
     XmppDetails getXmppDetails() { return xmpp_details;}
     std::vector<Version> getCurrentVersions() { return curVersions; }
 };

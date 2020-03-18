@@ -117,6 +117,15 @@ void JsonFactory::addJsonObj(string strKey, JsonFactory jsObj) {
     }
 }
 
+void JsonFactory::addBoolValue(string strKey, bool bVal) {
+	if(!strKey.empty()) {
+		if(NULL == pJRoot) {
+			pJRoot      = json_object();
+		}
+		json_object_set_new(pJRoot, strKey.c_str(), json_boolean(bVal));
+	}
+}
+
 unsigned char JsonFactory::isKeyAvailable(string strKey) {
     json_t *pJsonObj= NULL;
     if(NULL == pJRoot) {

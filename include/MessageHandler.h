@@ -45,8 +45,8 @@ public:
     void onXmppDisconnect(int iErr);
 
     //	Http response handler
-    void onDownloadSuccess(int iResp);
-    void onDownloadFailure(int iResp);
+    void onDownloadSuccess(int iResp, int iCmdNo);
+    void onDownloadFailure(int iResp, int iCmdNo);
 };
 
 #endif /* MESSAGEHANDLER_H_ */

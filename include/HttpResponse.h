@@ -14,8 +14,8 @@ class HttpResponse {
 public:
     HttpResponse(){};
     virtual ~HttpResponse(){};
-    virtual void onDownloadSuccess(int iRespCode) = 0;
-    virtual void onDownloadFailure(int iRespCode) = 0;
+    virtual void onDownloadSuccess(int iRespCode, int iCmdNo) = 0;
+    virtual void onDownloadFailure(int iRespCode, int iCmdNo) = 0;
 };
 
 

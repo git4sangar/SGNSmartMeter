@@ -45,7 +45,8 @@ Provisioning a new RPi
                             "xmpp_client" : {
                             "client_jid"		: "altimeter_0001@im.koderoot.net",
                             "client_password"	: "abcd1234",
-                            "cpanel_jid"		: "technospurs@im.koderoot.net"
+                            "cpanel_jid"		: "technospurs@im.koderoot.net",
+                            "rpi_unique_id"		: "mac-address"
                         }
                 I will provide a console based tool for generating the encryption
 
@@ -59,6 +60,7 @@ Provisioning a new RPi
 (10) A xmpp message to trigger a download shall look like this
 	{
 		"command":"smart_meter_update",
+		"command_no" : 10,
 		"url":"https://technospurs.com/imageSets.zip",
 		"processes" :
         [
@@ -70,6 +72,22 @@ Provisioning a new RPi
 	Additional Info
 	===============
 	on unzipping, it shall yield "SmartMeter" folder with necessary sub folders
+	comman_no	=>	uniquely identifies a particular request among the series of requests.
+					for eg: if a "s/w update req" is made to a number of Smart Meters, say, for upgrading to ver1.3.2, the command-no val, say 10, is same for all the Smart Meters.
+					So the command-no 10 uniquely identifies the "s/w update req ver1.3.2" to the given set of Smart Meters
+
+					the response contains this number, saying, upgrade-request v1.3.2 for Smart Meter is success or failure
+					increment this command-no for every new request of any type
+
+	The response will be as follows
+	{
+		"command_no"	: 10,
+		"from"		: "value of rpi_unique_id set in config file",
+		"succcess"	: true or false,
+		"remarks"	: ""
+	}
+	remarks => conveys the error in case of failure
+
 			
 			
 

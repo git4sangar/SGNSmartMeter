@@ -14,6 +14,8 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include "Constants.h"
+#include "JsonFactory.h"
+#include "JabberClient.h"
 #include "FileHandler.h"
 
 FileHandler *FileHandler::pFileHandler = NULL;
@@ -143,16 +145,34 @@ bool FileHandler::extract(std::string filename) {
     return true;
 }
 
-void FileHandler::pushToQ(std::string strFileName) {
+void FileHandler::pushToQ(std::pair<std::string, int> qCntnt) {
     pthread_mutex_lock(&qLock);
-    msgQ.push(strFileName);
+    msgQ.push(qCntnt);
     pthread_cond_signal(&qCond);
     pthread_mutex_unlock(&qLock);
 }
 
+std::string FileHandler::makeRespPkt(int cmdNo, std::string strFrom, bool isSucces, std::string strRemarks) {
+	JsonFactory jsRoot;
+	jsRoot.addIntValue("command_no", cmdNo);
+	jsRoot.addStringValue("from", strFrom);
+	jsRoot.addBoolValue("success", isSucces);
+	jsRoot.addStringValue("remarks", strRemarks);
+	return jsRoot.getJsonString();
+}
+
 void *FileHandler :: run(void *pUserData) {
 	FileHandler *pThis	= reinterpret_cast<FileHandler *>(pUserData);
-	std::string strFileName;
+	std::string strFileName, strResp;
+	int cmdNo = 0;
+	std::pair<std::string, int> qVal;
+
+
+	Config *pCfg				= Config::getInstance();
+	XmppDetails xmpp			= pCfg->getXmppDetails();
+	std::string cPanelJid		= xmpp.getCPanelJid();
+	std::string strUnqId		= pCfg->getUniqueId();
+	JabberClient *pJabberClient	= JabberClient::getJabberClient();
 
 	while(true) {
 		pthread_mutex_lock(&pThis->qLock);
@@ -160,8 +180,12 @@ void *FileHandler :: run(void *pUserData) {
 			std::cout << "FileHandler: Waiting for messages" << std::endl;
 			pthread_cond_wait(&pThis->qCond, &pThis->qLock);
 		}
-		strFileName = pThis->msgQ.front();
+		qVal = pThis->msgQ.front();
 		pThis->msgQ.pop();
+
+		strFileName	= qVal.first;
+		cmdNo		= qVal.second;
+
 		std::cout << "FileHandler: Got a file, " << strFileName << ", to extract" << std::endl;
 		pthread_mutex_unlock(&pThis->qLock);
 
@@ -184,9 +208,13 @@ void *FileHandler :: run(void *pUserData) {
 			chdir(TECHNO_SPURS_ROOT_PATH);
 			if(pThis->extract(strFileName)) {
 				//	Send a success message, probably with a version
+				strResp	= pThis->makeRespPkt(cmdNo, strUnqId, true, "");
+				pJabberClient->sendMsgTo(strResp, cPanelJid);
 			}
 		} else {
-			//	Send a message to techno spurs control-panel saying failed extracting
+			//	Control is not supposed to reach here. We are in bad shape now.
+			strResp	= pThis->makeRespPkt(cmdNo, strUnqId, false, "failed extracting zip");
+			pJabberClient->sendMsgTo(strResp, cPanelJid);
 		}
 	}
 	return NULL;
