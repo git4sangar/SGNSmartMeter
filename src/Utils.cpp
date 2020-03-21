@@ -256,6 +256,20 @@ in_addr_t Utils::getIpv4BroadcastIpOfEthIF() {
     return mybc;
 }
 
+void Utils::sendPacket(int port, std::string strPacket) {
+	struct hostent *he;
+
+	struct sockaddr_in their_addr;
+	int sockfd	= socket(AF_INET, SOCK_DGRAM, 0);
+	he	= gethostbyname("localhost");
+	their_addr.sin_family   = AF_INET;
+	their_addr.sin_port     = htons(port);
+	their_addr.sin_addr     = *((struct in_addr *)he->h_addr);
+	bzero(&(their_addr.sin_zero), 8);
+	sendto(sockfd, strPacket.c_str(), strPacket.length(), 0,
+			 (struct sockaddr *)&their_addr, sizeof(struct sockaddr));
+}
+
 int Utils::sendUDPPacket(in_addr_t toIp, int iPort, std::string strPayload, unsigned char isBroadCast) {
     int iSock = 0 ,bcEnable = 1;
 

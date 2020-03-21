@@ -21,7 +21,8 @@
 #define REBOOT_SYSTEM       	(7)
 #define	BLANK_CMD		(9)
 #define XMPP_RECONNECT		(10)
-#define MAX_COMMANDS        	(11)
+#define HEART_BEAT		(11)
+#define MAX_COMMANDS        	(12)
 
 class MessageStructure {
     std::map<std::string, int> headers;

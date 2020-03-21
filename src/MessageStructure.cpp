@@ -19,6 +19,7 @@ MessageStructure::MessageStructure() {
     headers["enable_log_level"]		= ENABLE_LOG_LEVEL;
     headers["reconnect_jabber"]		= XMPP_RECONNECT;
     headers["reboot_system"]		= REBOOT_SYSTEM;
+    headers["heart_beat"]		= HEART_BEAT;
 }
 
 int MessageStructure::getCommandVal(std::string strCmd) {

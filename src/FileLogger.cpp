@@ -45,8 +45,8 @@ void Logger::stampTime() {
 	secs = secs % 36000;	// reset secs every 10 hours
 	unsigned long msecs	= st.tv_usec / 1000;
 	unsigned long usecs	= st.tv_usec % 1000;
-	std::cout << secs << ":" << msecs << ":" << usecs << ":";
-	ss_log << secs << ":" << msecs << ":" << usecs << ":";
+	std::cout << secs << ":" << msecs << ":" << usecs << ": ";
+	ss_log << secs << ":" << msecs << ":" << usecs << ": ";
 }
 
 Logger &Logger::operator << (StandardEndLine manip) {

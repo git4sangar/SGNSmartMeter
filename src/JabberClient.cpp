@@ -155,7 +155,7 @@ void JabberClient::xmppShutDown() {
 }
 
 int JabberClient::sendMsgTo(std::string strMsg, std::string toAddress) {
-    std::cout << "&& Sending " << strMsg << " to " << toAddress << std::endl;
+    std::cout << "JabberClient:  " << strMsg << " to " << toAddress << std::endl;
     xmpp_stanza_t *reply = NULL, *body = NULL, *text = NULL;
 
     if(toAddress.empty()) {

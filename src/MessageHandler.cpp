@@ -18,6 +18,7 @@
 #include "HttpClient.h"
 #include "FileHandler.h"
 #include "FileLogger.h"
+#include "Utils.h"
 
 MessageHandler *MessageHandler::pMsgH;
 
@@ -98,7 +99,7 @@ std::vector<Version> MessageHandler:: getNewVersions(std::string strNewVersions)
     return newVersions;
 }
 
-void MessageHandler::reconnet_jabber() {
+void MessageHandler::reconnectJabber() {
 	Config *pConfig	= Config::getInstance();
 	JabberClient *pJabberClient   = JabberClient::getJabberClient();
 
@@ -115,11 +116,32 @@ void MessageHandler::reconnet_jabber() {
 	}
 }
 
+void MessageHandler::sendHeartBeat() {
+	std::string strBinFile	= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_BIN_FILE);
+
+	if(strHeartBeat.empty()) {
+		JsonFactory jsRoot, jsVer;
+		jsRoot.addStringValue("process_name", "JabberClient");
+		jsRoot.addIntValue("pid_of_process", getpid());
+		jsRoot.addStringValue("run_command", strBinFile);
+
+		jsVer.addIntValue("major", MAJOR_VERSION);
+		jsVer.addIntValue("minor", MINOR_VERSION);
+		jsVer.addIntValue("patch", PATCH_VERSION);
+
+		jsRoot.addJsonObj("version", jsVer);
+		strHeartBeat	= jsRoot.getJsonString();
+	}
+
+	log << "MessageHandler: Sending Heartbeat " << strHeartBeat << std::endl;
+	Utils::sendPacket(HEART_BEAT_PORT, strHeartBeat);
+}
+
 void MessageHandler:: uploadLogs() {
     log << "Message Handler: Uploading Logs" << std::endl;
 }
 
-void MessageHandler:: enable_log_level() {
+void MessageHandler:: enableLogLevel() {
     log << "Message Handler: Enabling log level" << std::endl;
 }
 
@@ -137,7 +159,7 @@ MessageHandler *MessageHandler::getInstance() {
 }
 
 void MessageHandler::onXmppConnect() {
-    log << "Xmpp connected \n" << std::endl;
+    log << "JabberClient: Xmpp connected \n" << std::endl;
 }
 
 void MessageHandler::onXmppDisconnect(int iErr) {
@@ -187,7 +209,11 @@ void *MessageHandler::run(void *pUserData) {
                     break;
 
                 case XMPP_RECONNECT:
-                	pThis->reconnet_jabber();
+                	pThis->reconnectJabber();
+                	break;
+
+                case HEART_BEAT:
+                	pThis->sendHeartBeat();
                 	break;
 
                 case UPLOAD_LOGS:
@@ -195,7 +221,7 @@ void *MessageHandler::run(void *pUserData) {
                     break;
 
                 case ENABLE_LOG_LEVEL:
-                    pThis->enable_log_level();
+                    pThis->enableLogLevel();
                     break;
 
                 case REBOOT_SYSTEM:

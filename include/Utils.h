@@ -55,6 +55,7 @@ public:
                           unsigned char *iv, unsigned char *plaintext);
     static in_addr_t getIpv4BroadcastIpOfEthIF();
     static in_addr_t getIpv4IpOfEthIF();
+    static void sendPacket(int port, std::string strPacket);
     static int sendUDPPacket(in_addr_t toIp, int iPort, std::string strPayload, unsigned char isBroadCast = 0);
     static std::string getDotFormattedIp(in_addr_t ip);
 };

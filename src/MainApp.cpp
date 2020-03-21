@@ -18,6 +18,7 @@
 #include "FileHandler.h"
 #include "FileLogger.h"
 
+void *heartBeat(void *);
 int main() {
 
 	//	First and foremost, wait for 2 mins.
@@ -27,6 +28,10 @@ int main() {
 	Logger &log = Logger::getInstance();
 
 	log << "Starting Application" << std::endl;
+
+	pthread_t heartBeatThread;
+	pthread_create(&heartBeatThread, NULL, &heartBeat, NULL);
+	pthread_detach(heartBeatThread);
 
     Config *pConfig	= Config::getInstance();
     pConfig->parseCurVersions();
@@ -60,4 +65,19 @@ int main() {
     }
 
     return 0;
+}
+
+void *heartBeat(void *pUserData) {
+	std::string strCmd	= "{ \"command\" : \"heart_beat\" }";
+	Logger &log = Logger::getInstance();
+
+	JabberClient *pJabberClient	= JabberClient::getJabberClient();
+	Config *pConfig	= Config::getInstance();
+
+	log << "Starting Heartbeat thread" << std::endl;
+	while(true) {
+		sleep(25);
+		log << "Main: Sending HeartBeat msg to self JID" << std::endl;
+		pJabberClient->sendMsgTo(strCmd, pConfig->getXmppDetails().getClientJid());
+	}
 }

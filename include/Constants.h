@@ -28,12 +28,17 @@
 #include "JsonException.h"
 #include "Utils.h"
 
+#define MAJOR_VERSION	(1)
+#define MINOR_VERSION	(0)
+#define PATCH_VERSION	(0)
+
 #define ENCRYPT_KEY     "01234567890123456789012345678901"
 #define ENCRYPT_SALT    "0123456789012345"
 
 #define ONE_KB  		(1024)
 #define ONE_MB  		(1024 * 1024)
 #define WAIT_TIME_SECs	(2 * 60)
+#define HEART_BEAT_PORT	(4951)
 
 //	Let all paths be suffixed with "/"
 //	Treat it as folders otherwise
@@ -47,6 +52,7 @@
 #define TECHNO_SPURS_TEMP_DWLD_PATH	"downloads/SmartMeter"
 #define TECHNO_SPURS_APP_FOLDER		"SmartMeter"
 #define TECHNO_SPURS_LOG_PATH		"logs/"
+#define TECHNO_SPURS_BIN_FILE		"bin/JabberClient"
 
 #define MAX_FILE_SIZE           ONE_MB
 #define MAX_RETRY_COUNT			(3)

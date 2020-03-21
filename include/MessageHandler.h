@@ -22,6 +22,7 @@ class MessageHandler : public HttpResponse, public JabberResponse {
     pthread_mutex_t qLock;
     pthread_cond_t qCond;
     Logger &log;
+    std::string strHeartBeat;
 
     MessageStructure msgStruct;
 
@@ -34,9 +35,10 @@ public:
     void pushToQ(std::string msg);
     void smartMeterUpdate(std::string strPkt);
     void uploadLogs();
-    void enable_log_level();
+    void enableLogLevel();
     void reboot();
-    void reconnet_jabber();
+    void reconnectJabber();
+    void sendHeartBeat();
     std::vector<Version> getNewVersions(std::string strNewVersions);
 
     static MessageHandler *getInstance();
