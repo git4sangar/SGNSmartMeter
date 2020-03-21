@@ -95,6 +95,23 @@ std::vector<Version> MessageHandler:: getNewVersions(std::string strNewVersions)
     return newVersions;
 }
 
+void MessageHandler::reconnet_jabber() {
+	Config *pConfig	= Config::getInstance();
+	JabberClient *pJabberClient   = JabberClient::getJabberClient();
+
+	XmppDetails xmppDetails = pConfig->getXmppDetails();
+	pJabberClient->xmppShutDown();
+	sleep(5);
+	int iRet = pJabberClient->connect("", xmppDetails.getClientJid().c_str(), xmppDetails.getClientPwd().c_str());
+	std::cout << "Returned " << iRet << std::endl;
+	while(0 != iRet) {
+		pJabberClient->xmppShutDown();
+		sleep(2);
+		std::cout << "Connecting again in loop " << iRet << std::endl;
+		iRet	= pJabberClient->connect("", xmppDetails.getClientJid().c_str(), xmppDetails.getClientPwd().c_str());
+	}
+}
+
 void MessageHandler:: uploadLogs() {
     std::cout << "Message Handler: Uploading Logs" << std::endl;
 }
@@ -122,12 +139,15 @@ void MessageHandler::onXmppConnect() {
 
 void MessageHandler::onXmppDisconnect(int iErr) {
     std::cout << "Xmpp disconnected \n" << std::endl;
+    JsonFactory jsRoot;
+    jsRoot.addStringValue("command", "reconnect_jabber");
+    std::string strCmd	= jsRoot.getJsonString();
+    pushToQ(strCmd);
 }
 
 void MessageHandler::onXmppMessage(std::string strMsg, std::string strFrom) {
     pushToQ(strMsg);
 }
-
 
 void MessageHandler::pushToQ(std::string strMsg) {
     pthread_mutex_lock(&qLock);
@@ -160,6 +180,10 @@ void *MessageHandler::run(void *pUserData) {
                     pThis->smartMeterUpdate(strMsg);
                     break;
 
+                case XMPP_RECONNECT:
+                	pThis->reconnet_jabber();
+                	break;
+
                 case UPLOAD_LOGS:
                     pThis->uploadLogs();
                     break;
@@ -171,6 +195,10 @@ void *MessageHandler::run(void *pUserData) {
                 case REBOOT_SYSTEM:
                     pThis->reboot();
                     break;
+
+                default:
+                	std::cout << "Unknown command" << std::endl;
+                	break;
                 }
             } catch(JsonException &jed) {
                 std::cout << jed.what() << std::endl;

@@ -19,7 +19,6 @@ JabberClient::JabberClient() {
     pFrom   = NULL;
     pXmppListener = NULL;
     //xmppThread = 0;
-    isConnected = 0;
 }
 JabberClient::~JabberClient() {}
 
@@ -32,6 +31,7 @@ JabberClient *JabberClient::getJabberClient(void) {
     return pJabberClient;
 }
 
+//	Returns 0 on success and -1 on failure
 int JabberClient::connect(std::string strServer, std::string strFullJid, std::string strPswd){
 
     xmpp_initialize();
@@ -39,14 +39,13 @@ int JabberClient::connect(std::string strServer, std::string strFullJid, std::st
     ctx     = xmpp_ctx_new(NULL, log);
     conn    = xmpp_conn_new(ctx);
 
+    xmpp_conn_set_keepalive(conn, KA_TIMEOUT, KA_INTERVAL);
     std::cout    << "&& connecting xmpp server with username "
                 << strFullJid << ", password " << strPswd << std::endl;
 
     xmpp_conn_set_jid(conn, strFullJid.c_str());
     xmpp_conn_set_pass(conn, strPswd.c_str());
-    xmpp_connect_client(conn, NULL, 0, JabberClient::conn_handler, this);
-
-    return 0;
+    return xmpp_connect_client(conn, NULL, 0, JabberClient::conn_handler, this);
 }
 
 void JabberClient::conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_t status,
@@ -69,7 +68,7 @@ void JabberClient::conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_
         if(pJabberClient->pXmppListener) pJabberClient->pXmppListener->onXmppConnect();
     }
     else {
-        xmpp_stop(ctx);
+    	if(pJabberClient->pXmppListener) pJabberClient->pXmppListener->onXmppDisconnect(status);
     }
 }
 
@@ -147,6 +146,12 @@ int JabberClient::message_handler(xmpp_conn_t * const conn, xmpp_stanza_t * cons
 
     xmpp_free(ctx, intext);
     return 1;
+}
+
+void JabberClient::xmppShutDown() {
+	xmpp_conn_release(conn);
+	xmpp_ctx_free(ctx);
+	xmpp_shutdown();
 }
 
 int JabberClient::sendMsgTo(std::string strMsg, std::string toAddress) {

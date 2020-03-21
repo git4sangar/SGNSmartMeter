@@ -14,6 +14,8 @@
 #include <pthread.h>
 #include <strophe.h>
 
+#define KA_TIMEOUT 60
+#define KA_INTERVAL 1
 
 class JabberClient {
     JabberClient();
@@ -23,7 +25,6 @@ class JabberClient {
     xmpp_conn_t *conn;
     xmpp_log_t *log;
     char *pFrom;
-    unsigned char isConnected;
 
 public:
         virtual ~JabberClient();
@@ -33,9 +34,7 @@ public:
         void stopXmpp();
         void startXmpp() { if(NULL != ctx) xmpp_run(ctx);}
         int sendMsgTo(std::string strMsg, std::string toAddress);
-        unsigned char isXmppConnected() { return isConnected; }
-        void xmppConnected() {isConnected = 1;}
-        void xmppDisconnected() {isConnected = 0; }
+        void xmppShutDown();
         xmpp_ctx_t *getConext() {return ctx;}
 
         JabberResponse *pXmppListener;

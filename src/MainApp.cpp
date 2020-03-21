@@ -42,7 +42,13 @@ int main() {
         FileHandler::getInstance();
 
     	//	Now all set to launch the Jabber client
-    	pJabberClient->connect("", xmppDetails.getClientJid().c_str(), xmppDetails.getClientPwd().c_str());
+        int iRet = pJabberClient->connect("", xmppDetails.getClientJid().c_str(), xmppDetails.getClientPwd().c_str());
+        while(0 != iRet) {
+        	pJabberClient->xmppShutDown();
+        	sleep(2);
+        	iRet	= pJabberClient->connect("", xmppDetails.getClientJid().c_str(), xmppDetails.getClientPwd().c_str());
+        }
+
     	pJabberClient->startXmpp();
     }
 

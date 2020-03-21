@@ -25,10 +25,10 @@ Provisioning a new RPi
         (c) sudo vim /path/to/sdcard/etc/shadow
         (d) locate the line that starts with pi and replace the text between the first and second ":" with the above output
         (e) save the file
-
-(03) Copy the libraries required for XMPP Client & Watch dog server to /path/to/sdcard/usr/local/lib
-(04) Copy the packages required for python to appropriate /path/to/sdcard/home/pi/.local/lib/python3.5/site-packages
-(05) Create the following folders
+(03) Change the current time zone
+(04) Copy the libraries required for XMPP Client & Watch dog server to /path/to/sdcard/usr/local/lib
+(05) Copy the packages required for python to appropriate /path/to/sdcard/home/pi/.local/lib/python3.5/site-packages
+(06) Create the following folders
                 (a) /path/to/sdcard/home/pi/technospurs/certs/
                 (b) /path/to/sdcard/home/pi/technospurs/cfg
                 (c) /path/to/sdcard/home/pi/technospurs/wdog
@@ -37,10 +37,10 @@ Provisioning a new RPi
                 (f) /path/to/sdcard/home/pi/technospurs/bin
                 (g) /path/to/sdcard/home/pi/technospurs/logs
 
-(06) copy the certificates to /path/to/sdcard/home/pi/technospurs/certs/cacert.pem => I will hardcode this. If required, we can replace this file through software update
-(07) copy the python code to /path/to/sdcard/home/pi/technospurs/ (folder name is Smartmeter right?)
-(08) copy the xmpp client & watch dog server code to /path/to/sdcard/home/pi/technospurs/bin
-(09) encrypt the xmpp client credentials (as follows), encrypt it & save as config_file.bin and copy it to /path/to/sdcard/home/pi/technospurs/cfg
+(07) copy the certificates to /path/to/sdcard/home/pi/technospurs/certs/cacert.pem => I will hardcode this. If required, we can replace this file through software update
+(08) copy the python code to /path/to/sdcard/home/pi/technospurs/ (folder name is Smartmeter right?)
+(09) copy the xmpp client & watch dog server code to /path/to/sdcard/home/pi/technospurs/bin
+(10) encrypt the xmpp client credentials (as follows), encrypt it & save as config_file.bin and copy it to /path/to/sdcard/home/pi/technospurs/cfg
                         {
                             "xmpp_client" : {
                             "client_jid"		: "altimeter_0001@im.koderoot.net",
@@ -57,7 +57,7 @@ Provisioning a new RPi
 					(c) Symmetric Key: "01234567890123456789012345678901"
 					(d) Salt: "0123456789012345"
 
-(10) A xmpp message to trigger a download shall look like this
+(11) A xmpp message to trigger a download shall look like this
 	{
 		"command":"smart_meter_update",
 		"command_no" : 10,

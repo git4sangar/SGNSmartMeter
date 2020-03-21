@@ -34,6 +34,7 @@ public:
     void uploadLogs();
     void enable_log_level();
     void reboot();
+    void reconnet_jabber();
     std::vector<Version> getNewVersions(std::string strNewVersions);
 
     static MessageHandler *getInstance();
