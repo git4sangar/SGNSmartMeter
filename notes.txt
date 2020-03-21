@@ -42,12 +42,13 @@ Provisioning a new RPi
 (09) copy the xmpp client & watch dog server code to /path/to/sdcard/home/pi/technospurs/bin
 (10) encrypt the xmpp client credentials (as follows), encrypt it & save as config_file.bin and copy it to /path/to/sdcard/home/pi/technospurs/cfg
                         {
-                            "xmpp_client" : {
-                            "client_jid"		: "altimeter_0001@im.koderoot.net",
-                            "client_password"	: "abcd1234",
-                            "cpanel_jid"		: "technospurs@im.koderoot.net",
-                            "rpi_unique_id"		: "mac-address"
-                        }
+							"xmpp_client" : {
+								"client_jid" : "altimeter_0001@im.koderoot.net",
+								"client_password" : "abcd1234",
+								"cpanel_jid" : "technospurs@im.koderoot.net"
+							},
+							"rpi_unique_id"	: "mac-address"
+						}
                 I will provide a console based tool for generating the encryption
 
 				Additional Info
@@ -81,8 +82,8 @@ Provisioning a new RPi
 
 	The response will be as follows
 	{
-		"command_no"	: 10,
-		"from"		: "value of rpi_unique_id set in config file",
+		"command_no": 10,
+		"from"		: "value of rpi_unique_id as provided in config file",
 		"succcess"	: true or false,
 		"remarks"	: ""
 	}

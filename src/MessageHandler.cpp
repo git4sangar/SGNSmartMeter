@@ -17,10 +17,11 @@
 #include "JsonFactory.h"
 #include "HttpClient.h"
 #include "FileHandler.h"
+#include "FileLogger.h"
 
 MessageHandler *MessageHandler::pMsgH;
 
-MessageHandler::MessageHandler() {
+MessageHandler::MessageHandler() : log(Logger::getInstance()) {
     qLock   = PTHREAD_MUTEX_INITIALIZER;
     qCond   = PTHREAD_COND_INITIALIZER;
     pthread_t msg_handler_thread;
@@ -39,7 +40,8 @@ void MessageHandler:: smartMeterUpdate(std::string strPkt) {
     for(Version newVer : newVersions) {
         Version curVer  = pConfig->getVerForProc(newVer.getProcName());
         if(curVer < newVer) {
-            std::cout << "Message Handler: Current Version < New Version" << std::endl;
+        	log << "MessageHandler: Cur Ver " << curVer.getVerString() << ", New Ver " << newVer.getVerString() << std::endl;
+        	log << "Message Handler: Cur Ver < New Ver" << std::endl;
             isUpdateRequired    = true;
             break;
         }
@@ -48,20 +50,21 @@ void MessageHandler:: smartMeterUpdate(std::string strPkt) {
         JsonFactory jsRoot;
         jsRoot.setJsonString(strPkt);
         std::string strUrl;
+
         int cmdNo = 0;
         try {
             jsRoot.validateJSONAndGetValue("url", strUrl);
             jsRoot.validateJSONAndGetValue("command_no", cmdNo);
             HttpClient *pHttpClient = HttpClient::getInstance();
-            std::cout << "Message Handler: Triggering software update" << std::endl;
+            log << "MessageHandler: Triggering software update" << std::endl;
 
             std::pair<std::string, int> reqPair	= std::make_pair(strUrl, cmdNo);
             pHttpClient->pushToQ(reqPair);
         } catch(JsonException &jed) {
-            std::cout << jed.what() << std::endl;
+        	log << jed.what() << std::endl;
         }
     } else {
-        std::cout << "Message Handler: Current Version >= New Version" << std::endl;
+        log << "Message Handler: Current Version >= New Version" << std::endl;
     }
 }
 
@@ -90,7 +93,7 @@ std::vector<Version> MessageHandler:: getNewVersions(std::string strNewVersions)
         }
 
     } catch(JsonException &jed) {
-        std::cout << jed.what() << std::endl;
+        log << jed.what() << std::endl;
     }
     return newVersions;
 }
@@ -103,25 +106,25 @@ void MessageHandler::reconnet_jabber() {
 	pJabberClient->xmppShutDown();
 	sleep(5);
 	int iRet = pJabberClient->connect("", xmppDetails.getClientJid().c_str(), xmppDetails.getClientPwd().c_str());
-	std::cout << "Returned " << iRet << std::endl;
+	log << "Returned " << iRet << std::endl;
 	while(0 != iRet) {
 		pJabberClient->xmppShutDown();
 		sleep(2);
-		std::cout << "Connecting again in loop " << iRet << std::endl;
+		log << "Connecting again in loop " << iRet << std::endl;
 		iRet	= pJabberClient->connect("", xmppDetails.getClientJid().c_str(), xmppDetails.getClientPwd().c_str());
 	}
 }
 
 void MessageHandler:: uploadLogs() {
-    std::cout << "Message Handler: Uploading Logs" << std::endl;
+    log << "Message Handler: Uploading Logs" << std::endl;
 }
 
 void MessageHandler:: enable_log_level() {
-    std::cout << "Message Handler: Enabling log level" << std::endl;
+    log << "Message Handler: Enabling log level" << std::endl;
 }
 
 void MessageHandler:: reboot() {
-    std::cout << "Message Handler: Rebooting system" << std::endl;
+    log << "Message Handler: Rebooting system" << std::endl;
 }
 
 MessageHandler:: ~MessageHandler() {}
@@ -134,11 +137,11 @@ MessageHandler *MessageHandler::getInstance() {
 }
 
 void MessageHandler::onXmppConnect() {
-    std::cout << "Xmpp connected \n" << std::endl;
+    log << "Xmpp connected \n" << std::endl;
 }
 
 void MessageHandler::onXmppDisconnect(int iErr) {
-    std::cout << "Xmpp disconnected \n" << std::endl;
+    log << "Xmpp disconnected \n" << std::endl;
     JsonFactory jsRoot;
     jsRoot.addStringValue("command", "reconnect_jabber");
     std::string strCmd	= jsRoot.getJsonString();
@@ -160,20 +163,23 @@ void *MessageHandler::run(void *pUserData) {
     MessageHandler *pThis    = reinterpret_cast<MessageHandler *>(pUserData);
     std::string strMsg;
     std::string strCmd;
+    Logger &log = pThis->log;
+
     while(1) {
         pthread_mutex_lock(&pThis->qLock);
         if(pThis->msgQ.empty()) {
-            std::cout << "MessageHandler: Waiting for messages" << std::endl;
+            log << "MessageHandler: Waiting for messages" << std::endl;
             pthread_cond_wait(&pThis->qCond, &pThis->qLock);
         }
         strMsg = pThis->msgQ.front();
         pThis->msgQ.pop();
-        std::cout << "&& Got a message " << strMsg << std::endl;
+        log << "MessageHandler: Got a message " << strMsg << std::endl;
         pthread_mutex_unlock(&pThis->qLock);
         try {
             JsonFactory jsRoot;
             jsRoot.setJsonString(strMsg);
             jsRoot.validateJSONAndGetValue("command", strCmd);
+            log << "MessageHandler: Got command " << strCmd << std::endl;
             int iCmd    = pThis->msgStruct.getCommandVal(strCmd);
             switch(iCmd) {
                 case SMART_METER_UPDATE:
@@ -197,11 +203,11 @@ void *MessageHandler::run(void *pUserData) {
                     break;
 
                 default:
-                	std::cout << "Unknown command" << std::endl;
+                	log << "MessageHandler: Error: Unknown command " << strCmd << std::endl;
                 	break;
                 }
             } catch(JsonException &jed) {
-                std::cout << jed.what() << std::endl;
+                log << "MessageHandler: Error: Parsing JSON" << jed.what() << std::endl;
             }
     }
     return NULL;
@@ -209,14 +215,15 @@ void *MessageHandler::run(void *pUserData) {
 
 void MessageHandler::onDownloadSuccess(int iResp, int iCmdNo) {
 	std::pair<std::string, int> reqPair;
-    std::string dwldFile	= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_DOWNLOAD_FILE);
-    FileHandler *pFH		= FileHandler::getInstance();
-    reqPair			= std::make_pair(dwldFile, iCmdNo);
+    std::string dwldFile= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_DOWNLOAD_FILE);
+    log << "MessageHandler: Triggering extract request " << dwldFile << std::endl;
+    FileHandler *pFH	= FileHandler::getInstance();
+    reqPair				= std::make_pair(dwldFile, iCmdNo);
     pFH->pushToQ(reqPair);
 }
 
 void MessageHandler::onDownloadFailure(int iResp, int iCmdNo) {
-    //  Inform server jid regarding failure
+    log << "MessageHandler: Download reqeust failed for CmdNo " << iCmdNo << std::endl;
 }
 
 

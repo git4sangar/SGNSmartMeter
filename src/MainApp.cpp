@@ -16,12 +16,17 @@
 #include "MessageHandler.h"
 #include "HttpClient.h"
 #include "FileHandler.h"
+#include "FileLogger.h"
 
 int main() {
 
 	//	First and foremost, wait for 2 mins.
 	//	Let the environment get settled & let all the Smartmeter processes get up & running
-	//	sleep(WAIT_TIME_SECs);
+	//sleep(WAIT_TIME_SECs);
+
+	Logger &log = Logger::getInstance();
+
+	log << "Starting Application" << std::endl;
 
     Config *pConfig	= Config::getInstance();
     pConfig->parseCurVersions();
@@ -44,10 +49,12 @@ int main() {
     	//	Now all set to launch the Jabber client
         int iRet = pJabberClient->connect("", xmppDetails.getClientJid().c_str(), xmppDetails.getClientPwd().c_str());
         while(0 != iRet) {
+        	log << "Main: Error: XMPP connection to server failed with error " << iRet << std::endl;
         	pJabberClient->xmppShutDown();
-        	sleep(2);
+        	sleep(5);
         	iRet	= pJabberClient->connect("", xmppDetails.getClientJid().c_str(), xmppDetails.getClientPwd().c_str());
         }
+        log << "Main: XMPP connection to server through" << std::endl;
 
     	pJabberClient->startXmpp();
     }

@@ -11,11 +11,12 @@
 #include <stdio.h>
 #include <strophe.h>
 #include "JabberClient.h"
+#include "FileLogger.h"
 
-JabberClient::JabberClient() {
+JabberClient::JabberClient() : log(Logger::getInstance()) {
     ctx     = NULL;
     conn    = NULL;
-    log     = NULL;
+    xmpp_log= NULL;
     pFrom   = NULL;
     pXmppListener = NULL;
     //xmppThread = 0;
@@ -35,12 +36,12 @@ JabberClient *JabberClient::getJabberClient(void) {
 int JabberClient::connect(std::string strServer, std::string strFullJid, std::string strPswd){
 
     xmpp_initialize();
-    log     = xmpp_get_default_logger(XMPP_LEVEL_DEBUG); /* pass NULL instead to silence output */
-    ctx     = xmpp_ctx_new(NULL, log);
+    xmpp_log= xmpp_get_default_logger(XMPP_LEVEL_ERROR); /* pass NULL instead to silence output */
+    ctx     = xmpp_ctx_new(NULL, xmpp_log);
     conn    = xmpp_conn_new(ctx);
 
     xmpp_conn_set_keepalive(conn, KA_TIMEOUT, KA_INTERVAL);
-    std::cout    << "&& connecting xmpp server with username "
+    log    << "JabberClient: Connecting xmpp server with username "
                 << strFullJid << ", password " << strPswd << std::endl;
 
     xmpp_conn_set_jid(conn, strFullJid.c_str());
@@ -57,7 +58,7 @@ void JabberClient::conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_
 
     if (status == XMPP_CONN_CONNECT) {
         xmpp_stanza_t* pres;
-        printf("DEBUG: connected\n");
+        pJabberClient->log << "JabberClient: Connected" << std::endl;
         xmpp_handler_add(conn, JabberClient::version_handler, "jabber:iq:version", "iq", NULL, ctx);
         xmpp_handler_add(conn, JabberClient::message_handler, NULL, "message", NULL, pJabberClient);
 
@@ -68,6 +69,7 @@ void JabberClient::conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_
         if(pJabberClient->pXmppListener) pJabberClient->pXmppListener->onXmppConnect();
     }
     else {
+    	pJabberClient->log << "JabberClient: Error: Connect to server failed" << std::endl;
     	if(pJabberClient->pXmppListener) pJabberClient->pXmppListener->onXmppDisconnect(status);
     }
 }
@@ -137,13 +139,11 @@ int JabberClient::message_handler(xmpp_conn_t * const conn, xmpp_stanza_t * cons
     intext      = xmpp_stanza_get_text(body);
     const char *pFrom = xmpp_stanza_get_attribute(stanza, "from");
 
+    pJabberClient->log << "JabberClient: Got packet " << intext << ", from " << pFrom << std::endl;
     if(pJabberClient->pXmppListener) {
             std::string strFrom = (pFrom) ? pFrom : "";
             pJabberClient->pXmppListener->onXmppMessage(std::string(intext), std::string(strFrom));
     }
-
-    //printf("Incoming message from %s: %s\n", xmpp_stanza_get_from(stanza), intext);
-
     xmpp_free(ctx, intext);
     return 1;
 }
@@ -159,7 +159,7 @@ int JabberClient::sendMsgTo(std::string strMsg, std::string toAddress) {
     xmpp_stanza_t *reply = NULL, *body = NULL, *text = NULL;
 
     if(toAddress.empty()) {
-    	printf("&& To Address is empty\n");
+    	log << "JabberClient: Error: Invalid to address" << std::endl;
         return -1;
     }
 

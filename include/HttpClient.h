@@ -16,11 +16,13 @@
 #include <queue>
 #include <utility>
 #include <curl/curl.h>
+#include "FileLogger.h"
 
 using namespace std;
 
 class HttpClient {
     HttpResponse *pListener;
+    Logger &log;
 
     queue<std::pair<std::string, int> > genericQ;
     pthread_mutex_t mtxgQ;

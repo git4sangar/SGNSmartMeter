@@ -69,6 +69,7 @@ JsonFactory JsonFactory::getObjAt(json_t* jsArrayObj, int iIndex) throw (JsonExc
     }
     pTemp   = json_array_get(jsArrayObj, iIndex);
     jsRoot.pJRoot   = pTemp;
+    json_incref(pJRoot);	//Otherwise crashes
     return jsRoot;
 }
 

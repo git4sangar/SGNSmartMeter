@@ -19,6 +19,7 @@ class FileHandler {
     std::queue<std::pair<std::string, int> > msgQ;
     pthread_mutex_t qLock;
     pthread_cond_t qCond;
+    Logger &log;
 
     int copy_data(struct archive * ar, struct archive * aw);
     bool rmdir(std::string dirname);

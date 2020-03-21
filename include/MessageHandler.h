@@ -15,11 +15,13 @@
 #include "HttpResponse.h"
 #include "MessageStructure.h"
 #include "JabberResponse.h"
+#include "FileLogger.h"
 
 class MessageHandler : public HttpResponse, public JabberResponse {
     std::queue<std::string> msgQ;
     pthread_mutex_t qLock;
     pthread_cond_t qCond;
+    Logger &log;
 
     MessageStructure msgStruct;
 

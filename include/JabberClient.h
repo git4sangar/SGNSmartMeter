@@ -13,6 +13,7 @@
 #include <string>
 #include <pthread.h>
 #include <strophe.h>
+#include "FileLogger.h"
 
 #define KA_TIMEOUT 60
 #define KA_INTERVAL 1
@@ -20,10 +21,11 @@
 class JabberClient {
     JabberClient();
     static JabberClient *pJabberClient;
+    Logger &log;
 
     xmpp_ctx_t *ctx;
     xmpp_conn_t *conn;
-    xmpp_log_t *log;
+    xmpp_log_t *xmpp_log;
     char *pFrom;
 
 public:

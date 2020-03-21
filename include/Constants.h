@@ -23,7 +23,7 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <ifaddrs.h>
-
+#include "FileLogger.h"
 #include "JsonFactory.h"
 #include "JsonException.h"
 #include "Utils.h"
@@ -49,7 +49,8 @@
 #define TECHNO_SPURS_LOG_PATH		"logs/"
 
 #define MAX_FILE_SIZE           ONE_MB
-#define MAX_RETRY_COUNT             (3)
+#define MAX_RETRY_COUNT			(3)
+#define MAX_LOG_SIZE			ONE_MB
 
 class XmppDetails {
     std::string client_jid,
@@ -63,6 +64,8 @@ public:
     std::string getClientJid() {return client_jid;}
     std::string getClientPwd() {return client_pwd;}
     std::string getCPanelJid() {return cpanel_jid;}
+
+    std::string toString();
 };
 
 class Version {
@@ -75,8 +78,11 @@ public:
 
     void setProcName(std::string name) { procName = name; }
     std::string getProcName() { return procName; }
+    std::string getVerString();
+
     void parseFromString(std::string strJson);
     void parseFromJsonFactory(JsonFactory jsRoot);
+
     bool operator < (const Version &other);
     bool operator > (const Version &other);
     bool operator == (const Version &other);
@@ -87,10 +93,10 @@ class Config {
     unsigned char *encrypt_key;     // 256 bit key
     unsigned char *encrypt_salt;    // 128 bit IV
     static Config *pConfig;
-    std::string strXmppDetails, strCurVersions;
+    std::string strXmppDetails, strCurVersions, rpi_uniqId;
     std::vector<Version> curVersions;
     XmppDetails xmpp_details;
-    std::string strUniqId;
+    Logger &log;
 
 public:
     virtual ~Config();
@@ -100,7 +106,9 @@ public:
     bool parseCurVersions();
     Version getVerForProc(std::string strProcName);
 
-    std::string getUniqueId() { return strUniqId; }
+    void setRPiUniqId(std::string _rpi_uniqId) { rpi_uniqId = _rpi_uniqId;}
+    std::string getRPiUniqId() {return rpi_uniqId;}
+
     XmppDetails getXmppDetails() { return xmpp_details;}
     std::vector<Version> getCurrentVersions() { return curVersions; }
 };

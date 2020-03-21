@@ -7,16 +7,18 @@
 
 #include <stdio.h>
 #include <iostream>
+#include <sstream>
 #include <string.h>
 #include <unistd.h>
 #include "JsonFactory.h"
 #include "JsonException.h"
 #include "Utils.h"
 #include "Constants.h"
+#include "FileLogger.h"
 
 Config *Config::pConfig = NULL;
 
-Config::Config() {
+Config::Config() : log(Logger::getInstance()){
     encrypt_key     = (unsigned char *) strdup(ENCRYPT_KEY);  // 256 bit key
     encrypt_salt    = (unsigned char *) strdup(ENCRYPT_SALT); // 128 bit IV
 }
@@ -72,7 +74,8 @@ bool Config::readEncryptedFile(std::string file_name, std::string &strContent) {
     "client_jid" : "altimeter_0001@im.koderoot.net",
     "client_password" : "abcd1234",
     "cpanel_jid" : "technospurs@im.koderoot.net"
-  }
+  },
+  "rpi_unique_id"	: "mac-address"
 }*/
 bool Config::parseXmppDetails() {
     JsonFactory jsRoot;
@@ -81,14 +84,17 @@ bool Config::parseXmppDetails() {
 
     std::string strCfgFile	= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_CFG_FILE);
     if(!readEncryptedFile(strCfgFile, strXmppDetails)) {
-        std::cout << "Failed reading XMPP Configurations" << std::endl;
+        log << "Config: Error: Reading encrypted-config file" << std::endl;
         return false;
     }
 
     if(!strXmppDetails.empty()) {
-        std::string client_jid, client_pwd, cpanel_jid;
+        std::string client_jid, client_pwd, cpanel_jid, rpi_uniqId;
         try {
             jsRoot.setJsonString(strXmppDetails);
+            jsRoot.validateJSONAndGetValue("rpi_unique_id", rpi_uniqId);
+            setRPiUniqId(rpi_uniqId);
+
             jsRoot.validateJSONAndGetValue("xmpp_client", jsXmpp);
             jsRoot.validateJSONAndGetValue("client_jid", client_jid, jsXmpp);
             jsRoot.validateJSONAndGetValue("client_password", client_pwd, jsXmpp);
@@ -97,9 +103,12 @@ bool Config::parseXmppDetails() {
             xmpp_details.setClientJid(client_jid);
             xmpp_details.setClientPwd(client_pwd);
             xmpp_details.setCPanelJid(cpanel_jid);
+
             bRet = true;
+            log << "Config: Parsed xmpp details: " << xmpp_details.toString() << std::endl;
+            log << "Config: RPi UniqID: " << rpi_uniqId << std::endl;
         } catch(JsonException &jed) {
-            std::cout << "Initialization: Config json parsing failed" << std::endl;
+            log << "Config: Error: Parsing xmpp details failed" << std::endl;
             std::cout << jed.what() << std::endl;
             bRet = false;
         }
@@ -121,7 +130,7 @@ bool Config::parseCurVersions() {
     Version procVer;
     std::string strVerFile	= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_VERSIONS);
     if(!readEncryptedFile(strVerFile, strCurVersions)) {
-        std::cout << "Failed reading Versions" << std::endl;
+        log << "Config: Error: Reading encrypted-versions file" << std::endl;
         return false;
     }
     JsonFactory jsRoot;
@@ -133,11 +142,13 @@ bool Config::parseCurVersions() {
         for(iLoop = 0; iLoop < jsRoot.getArraySize(jsProcs); iLoop++) {
             JsonFactory jsProc  = jsRoot.getObjAt(jsProcs, iLoop);
             procVer.parseFromJsonFactory(jsProc);
+            log << "Config: Parsing cur versions " << procVer.getVerString() << std::endl;
             curVersions.push_back(procVer);
         }
     } catch(JsonException &jed) {
         std::cout << jed.what() << std::endl;
     }
+    log << "Config: Parsed current versions" << std::endl;
     return true;
 }
 
@@ -152,8 +163,22 @@ Version Config:: getVerForProc(std::string strProcName) {
     return temp;
 }
 
+std::string XmppDetails::toString() {
+	std::stringstream ss;
+	ss << "\n\tclient_jid: " << client_jid
+		<< "\n\tclient_password: " << client_pwd
+		<< "\n\tcpanel_jid: " << cpanel_jid;
+	return ss.str();
+}
+
 Version::Version() : mjr {0}, mnr {0}, patch {0} { }
 Version::~Version() {}
+
+std::string Version::getVerString() {
+	std::stringstream ssver;
+	ssver << procName << " v" << mjr << "." << mnr << "." << patch;
+	return ssver.str();
+}
 
 bool Version::operator < (const Version &other) {
     if(mjr < other.mjr || mnr < other.mnr || patch < other.patch) {

@@ -12,16 +12,14 @@
 #include <curl/curl.h>
 #include "HttpClient.h"
 #include <sstream>
-
+#include "FileLogger.h"
 #include "Constants.h"
 
 HttpClient *HttpClient::pHttpClient = NULL;
 
-HttpClient :: HttpClient() {
+HttpClient :: HttpClient() : log(Logger::getInstance()) {
     mtxgQ       = PTHREAD_MUTEX_INITIALIZER;
     mtxgCond    = PTHREAD_COND_INITIALIZER;
-
-    cout << "&& Entering HttpClient constructor" << endl;
 
     curl_global_init(CURL_GLOBAL_ALL);
 
@@ -52,11 +50,11 @@ std::pair<std::string, int> HttpClient :: readFromQ() {
 	std::pair<std::string, int> reqPair;
     pthread_mutex_lock(&mtxgQ);
     if(genericQ.empty()) {
-        cout << "&& Waiting for http requests" << endl;
+        log << "HttpClient: Waiting for http requests" << endl;
         pthread_cond_wait(&mtxgCond, &mtxgQ);
     }
     reqPair = genericQ.front();
-    std::cout << "&& Got a request for download: " << reqPair.first << std::endl;
+    log << "HttpClient: Got a request for download: " << reqPair.first << std::endl;
     genericQ.pop();
     pthread_mutex_unlock(&mtxgQ);
     return reqPair;
@@ -72,15 +70,17 @@ void *HttpClient :: run(void *pHttpClient) {
     long respCode;
     FILE    *write_data;
     CURLcode res = CURLE_OK;
-    HttpClient *pThis = reinterpret_cast<HttpClient *>(pHttpClient);
+    HttpClient *pThis	= reinterpret_cast<HttpClient *>(pHttpClient);
+    Logger &log		= pThis->log;
 
-    cout << "&& Entering genericCurlThread" << endl;
+    log << "HttpClient: Curl thread started" << endl;
 
     struct curl_slist* headers = NULL;
     while(1) {
     	reqPair	= pThis->readFromQ();
     	strUrl	= reqPair.first;
     	cmdNo	= reqPair.second;
+    	log << "HttpClient: Got download req" << strUrl << endl;
 
         CURL *curl      = curl_easy_init();
         if(curl && pThis->pListener) {
@@ -110,8 +110,10 @@ void *HttpClient :: run(void *pHttpClient) {
 
             CURLcode infoResp = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &respCode);
             if(CURLE_OK == res && CURLE_OK == infoResp && respCode >= 200 && respCode <= 299) {
+            	log << "HttpClient: Downloaded zip file" << std::endl;
                 pThis->pListener->onDownloadSuccess(respCode, cmdNo);
             } else {
+            	log << "HttpClient: Error: res: " << res << ", infoResp: " << infoResp << ", respCode :" << respCode << std::endl;
                 pThis->pListener->onDownloadFailure(respCode, cmdNo);
             }
         }

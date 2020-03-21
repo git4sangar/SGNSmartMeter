@@ -16,12 +16,13 @@
 #include "Constants.h"
 #include "JsonFactory.h"
 #include "JabberClient.h"
+#include "FileLogger.h"
 #include "FileHandler.h"
 
 FileHandler *FileHandler::pFileHandler = NULL;
 
 
-FileHandler :: FileHandler() {
+FileHandler :: FileHandler() : log(Logger::getInstance()){
 	pthread_t file_handler_thread;
 	pthread_create(&file_handler_thread, NULL, &run, this);
 	pthread_detach(file_handler_thread);
@@ -166,18 +167,19 @@ void *FileHandler :: run(void *pUserData) {
 	std::string strFileName, strResp;
 	int cmdNo = 0;
 	std::pair<std::string, int> qVal;
+	Logger &log = pThis->log;
 
 
 	Config *pCfg				= Config::getInstance();
 	XmppDetails xmpp			= pCfg->getXmppDetails();
 	std::string cPanelJid		= xmpp.getCPanelJid();
-	std::string strUnqId		= pCfg->getUniqueId();
+	std::string strUnqId		= pCfg->getRPiUniqId();
 	JabberClient *pJabberClient	= JabberClient::getJabberClient();
 
 	while(true) {
 		pthread_mutex_lock(&pThis->qLock);
 		if(pThis->msgQ.empty()) {
-			std::cout << "FileHandler: Waiting for messages" << std::endl;
+			log << "FileHandler: Waiting for messages" << std::endl;
 			pthread_cond_wait(&pThis->qCond, &pThis->qLock);
 		}
 		qVal = pThis->msgQ.front();
@@ -186,11 +188,12 @@ void *FileHandler :: run(void *pUserData) {
 		strFileName	= qVal.first;
 		cmdNo		= qVal.second;
 
-		std::cout << "FileHandler: Got a file, " << strFileName << ", to extract" << std::endl;
+		log << "FileHandler: Got a file, " << strFileName << ", to extract" << std::endl;
 		pthread_mutex_unlock(&pThis->qLock);
 
 		//	delete the temporary download folder where previous downloads may exist
 		std::string tmp_dwld_path	= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_TEMP_DWLD_PATH);
+		log << "FileHandler: Deleting file " << tmp_dwld_path << std::endl;
 		pThis->rmdir(tmp_dwld_path);
 
 		//	extract the downloaded file in temp path and make sure it is extracting properly
@@ -199,6 +202,7 @@ void *FileHandler :: run(void *pUserData) {
 		//	check if extract is working
 		chdir(dwld_path.c_str());
 		if(pThis->extract(strFileName)) {
+			log << "FileHandler: File extract checking through" << std::endl;
 
 			//	now delete the actual folder
 			std::string app_path	= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_APP_FOLDER);
@@ -207,12 +211,18 @@ void *FileHandler :: run(void *pUserData) {
 			//	extract the downloaded file to app path
 			chdir(TECHNO_SPURS_ROOT_PATH);
 			if(pThis->extract(strFileName)) {
+				log << "FileHandler: Extracted zip file for command no " << cmdNo << std::endl;
 				//	Send a success message, probably with a version
 				strResp	= pThis->makeRespPkt(cmdNo, strUnqId, true, "");
 				pJabberClient->sendMsgTo(strResp, cPanelJid);
+
+				//	Now delete the versions file & let it be created by watch dog
+				std::string strVerFile	= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_VERSIONS);
+				unlink(strVerFile.c_str());
 			}
 		} else {
 			//	Control is not supposed to reach here. We are in bad shape now.
+			log << "FileHandler: Error: Failed extracting zip file with command no " << cmdNo << std::endl;
 			strResp	= pThis->makeRespPkt(cmdNo, strUnqId, false, "failed extracting zip");
 			pJabberClient->sendMsgTo(strResp, cPanelJid);
 		}
