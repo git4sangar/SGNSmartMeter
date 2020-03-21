@@ -89,6 +89,34 @@ Provisioning a new RPi
 	}
 	remarks => conveys the error in case of failure
 
-			
-			
+(12) Hearbeat to be given to Watchdog task
+	IP: 127.0.0.1
+	UDP Port: 4951
+	{
+		"process_name"		: "name of the process",
+		"pid_of_process"	: 444,
+		"run_command"		: "python3.5 /home/pi/technospurs/SmartMeter/ocr.py",
+		"version"			: { "major" : 1, "minor" : 0, "patch" : 0 }
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
