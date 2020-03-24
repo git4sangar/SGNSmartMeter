@@ -1,20 +1,5 @@
 sgn
 
-Heartbeat format for all the processes
-UDP Port: 4951
-IP : 127.0.0.1
-{
-	"process_name": "name_of_the_process",
-	"pid":444,
-	"run_command": "python3.5 /home/pi/technospurs/bin/SmartMeter/ocr...py"
-	"version": {
-		"major":1,
-		"minor":0,
-		"patch":0
-	}
-}
-curl -X POST "http://ec2-3-135-62-120.us-east-2.compute.amazonaws.com:3000/api/panelmap" -H "accept: application/json" -H "Content-Type: application/json" -d "{ \"panel_id\": \"string\"}"
-
 Provisioning a new RPi
 (01) Install the Raspbian Buster Lite on SD Card
 
@@ -34,12 +19,12 @@ Provisioning a new RPi
                 (c) /path/to/sdcard/home/pi/technospurs/wdog
                 (d) /path/to/sdcard/home/pi/technospurs/downloads
                 (e) /path/to/sdcard/home/pi/technospurs/SmartMeter
-                (f) /path/to/sdcard/home/pi/technospurs/bin
+                (f) /path/to/sdcard/home/pi/technospurs/Monitor
                 (g) /path/to/sdcard/home/pi/technospurs/logs
 
 (07) copy the certificates to /path/to/sdcard/home/pi/technospurs/certs/cacert.pem => I will hardcode this. If required, we can replace this file through software update
 (08) copy the python code to /path/to/sdcard/home/pi/technospurs/ (folder name is Smartmeter right?)
-(09) copy the xmpp client & watch dog server code to /path/to/sdcard/home/pi/technospurs/bin
+(09) copy the xmpp client & watch dog server code to /path/to/sdcard/home/pi/technospurs/Monitor
 (10) encrypt the xmpp client credentials (as follows), encrypt it & save as config_file.bin and copy it to /path/to/sdcard/home/pi/technospurs/cfg
                         {
 							"xmpp_client" : {
@@ -99,6 +84,7 @@ Provisioning a new RPi
 		"version"			: { "major" : 1, "minor" : 0, "patch" : 0 }
 	}
 
+curl -X POST "http://ec2-3-135-62-120.us-east-2.compute.amazonaws.com:3000/api/panelmap" -H "accept: application/json" -H "Content-Type: application/json" -d "{ \"panel_id\": \"string\"}"
 
 
 

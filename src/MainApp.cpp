@@ -23,7 +23,7 @@ int main() {
 
 	//	First and foremost, wait for 2 mins.
 	//	Let the environment get settled & let all the Smartmeter processes get up & running
-	//sleep(WAIT_TIME_SECs);
+	sleep(WAIT_TIME_SECs);
 
 	Logger &log = Logger::getInstance();
 

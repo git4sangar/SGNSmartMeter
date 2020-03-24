@@ -14,7 +14,7 @@ class HttpResponse {
 public:
     HttpResponse(){};
     virtual ~HttpResponse(){};
-    virtual void onDownloadSuccess(int iRespCode, int iCmdNo) = 0;
+    virtual void onDownloadSuccess(int iRespCode, int iCmdNo, std::string strDstPath) = 0;
     virtual void onDownloadFailure(int iRespCode, int iCmdNo) = 0;
 };
 

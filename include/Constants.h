@@ -51,12 +51,14 @@
 #define TECHNO_SPURS_DOWNLOAD_PATH	"downloads/"
 #define TECHNO_SPURS_TEMP_DWLD_PATH	"downloads/SmartMeter"
 #define TECHNO_SPURS_APP_FOLDER		"SmartMeter"
-#define TECHNO_SPURS_LOG_PATH		"logs/"
-#define TECHNO_SPURS_BIN_FILE		"bin/JabberClient"
+#define TECHNO_SPURS_LOG_FILE		"logs/jabber_client_logs.txt"
+#define TECHNO_SPURS_CLIENT_FOLDER	"JabberClient"
+#define TECHNO_SPURS_CLIENT_FILE	"JabberClient/JabberClient"
 
 #define MAX_FILE_SIZE           ONE_MB
 #define MAX_RETRY_COUNT			(3)
 #define MAX_LOG_SIZE			ONE_MB
+#define MODULE_NAME				"JabberClient"
 
 class XmppDetails {
     std::string client_jid,

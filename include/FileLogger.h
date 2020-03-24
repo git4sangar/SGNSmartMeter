@@ -19,8 +19,9 @@
 class Logger {
     pthread_mutex_t qLock;
     pthread_cond_t qCond;
+    bool bTime;
+    pthread_mutex_t writeLock;
 	std::queue<std::string> logQ;
-	bool bTime;
 
 	std::stringstream ss_log;
 	Logger();

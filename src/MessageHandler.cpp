@@ -58,9 +58,7 @@ void MessageHandler:: smartMeterUpdate(std::string strPkt) {
             jsRoot.validateJSONAndGetValue("command_no", cmdNo);
             HttpClient *pHttpClient = HttpClient::getInstance();
             log << "MessageHandler: Triggering software update" << std::endl;
-
-            std::pair<std::string, int> reqPair	= std::make_pair(strUrl, cmdNo);
-            pHttpClient->pushToQ(reqPair);
+            pHttpClient->softwareUpdate(cmdNo, strUrl);
         } catch(JsonException &jed) {
         	log << jed.what() << std::endl;
         }
@@ -117,7 +115,7 @@ void MessageHandler::reconnectJabber() {
 }
 
 void MessageHandler::sendHeartBeat() {
-	std::string strBinFile	= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_BIN_FILE);
+	std::string strBinFile	= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_CLIENT_FILE);
 
 	if(strHeartBeat.empty()) {
 		JsonFactory jsRoot, jsVer;
@@ -239,17 +237,17 @@ void *MessageHandler::run(void *pUserData) {
     return NULL;
 }
 
-void MessageHandler::onDownloadSuccess(int iResp, int iCmdNo) {
+void MessageHandler::onDownloadSuccess(int iResp, int iCmdNo, std::string strDstPath) {
 	std::pair<std::string, int> reqPair;
-    std::string dwldFile= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_DOWNLOAD_FILE);
-    log << "MessageHandler: Triggering extract request " << dwldFile << std::endl;
-    FileHandler *pFH	= FileHandler::getInstance();
-    reqPair				= std::make_pair(dwldFile, iCmdNo);
+	FileHandler *pFH	= FileHandler::getInstance();
+
+    log << "MessageHandler: Triggering extract request " << std::endl;
+    reqPair				= std::make_pair(strDstPath, iCmdNo);
     pFH->pushToQ(reqPair);
 }
 
 void MessageHandler::onDownloadFailure(int iResp, int iCmdNo) {
-    log << "MessageHandler: Download reqeust failed for CmdNo " << iCmdNo << std::endl;
+    log << "MessageHandler: Download request failed for CmdNo " << iCmdNo << std::endl;
 }
 
 

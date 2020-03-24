@@ -50,7 +50,7 @@ public:
     void onXmppDisconnect(int iErr);
 
     //	Http response handler
-    void onDownloadSuccess(int iResp, int iCmdNo);
+    void onDownloadSuccess(int iResp, int iCmdNo, std::string strDstPath);
     void onDownloadFailure(int iResp, int iCmdNo);
 };
 

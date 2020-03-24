@@ -22,7 +22,7 @@ Logger &Logger:: getInstance() {
 	return *pLogger;
 }
 
-Logger::Logger() : bTime(true) {
+Logger::Logger() : bTime (true), writeLock(PTHREAD_MUTEX_INITIALIZER) {
 	/*time_t now;
 	time(&now);
 	char suffix[32];
@@ -50,6 +50,7 @@ void Logger::stampTime() {
 }
 
 Logger &Logger::operator << (StandardEndLine manip) {
+	pthread_mutex_lock(&writeLock);
 	ss_log << std::endl; std::cout << std::endl; bTime = true;
 
 	ss_log.seekg(0, std::ios::end);
@@ -57,18 +58,23 @@ Logger &Logger::operator << (StandardEndLine manip) {
 		pushToQ(ss_log.str());
 		ss_log.str(""); ss_log.clear();
 	}
+	pthread_mutex_unlock(&writeLock);
 	return *this;
 }
 
 Logger &Logger::operator <<(const std::string strMsg) {
+	pthread_mutex_lock(&writeLock);
 	if(bTime) { stampTime(); bTime = false; }
 	ss_log << strMsg; std::cout << strMsg;
+	pthread_mutex_unlock(&writeLock);
 	return *this;
 }
 
 Logger &Logger::operator <<(int iVal) {
+	pthread_mutex_lock(&writeLock);
 	if(bTime) { stampTime(); bTime = false; }
 	ss_log << iVal; std::cout << iVal;
+	pthread_mutex_unlock(&writeLock);
 	return *this;
 }
 

@@ -164,11 +164,10 @@ std::string FileHandler::makeRespPkt(int cmdNo, std::string strFrom, bool isSucc
 
 void *FileHandler :: run(void *pUserData) {
 	FileHandler *pThis	= reinterpret_cast<FileHandler *>(pUserData);
-	std::string strFileName, strResp;
+	std::string strDstPath, strResp, strFolder;
 	int cmdNo = 0;
 	std::pair<std::string, int> qVal;
 	Logger &log = pThis->log;
-
 
 	Config *pCfg				= Config::getInstance();
 	XmppDetails xmpp			= pCfg->getXmppDetails();
@@ -185,14 +184,15 @@ void *FileHandler :: run(void *pUserData) {
 		qVal = pThis->msgQ.front();
 		pThis->msgQ.pop();
 
-		strFileName	= qVal.first;
+		strFolder	= qVal.first;
+		strDstPath	= std::string(TECHNO_SPURS_ROOT_PATH) + qVal.first;
 		cmdNo		= qVal.second;
 
-		log << "FileHandler: Got a file, " << strFileName << ", to extract" << std::endl;
+		log << "FileHandler: Got a extract request" << std::endl;
 		pthread_mutex_unlock(&pThis->qLock);
 
 		//	delete the temporary download folder where previous downloads may exist
-		std::string tmp_dwld_path	= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_TEMP_DWLD_PATH);
+		std::string tmp_dwld_path	= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_DOWNLOAD_PATH) + strFolder;
 		log << "FileHandler: Deleting file " << tmp_dwld_path << std::endl;
 		pThis->rmdir(tmp_dwld_path);
 
@@ -201,17 +201,18 @@ void *FileHandler :: run(void *pUserData) {
 
 		//	check if extract is working
 		chdir(dwld_path.c_str());
-		if(pThis->extract(strFileName)) {
-			log << "FileHandler: File extract checking through" << std::endl;
+		std::string strZipFile	= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_DOWNLOAD_FILE);
+		if(pThis->extract(strZipFile)) {
+			log << "FileHandler: File Extract Check: Through" << std::endl;
 
 			//	now delete the actual folder
-			std::string app_path	= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_APP_FOLDER);
-			pThis->rmdir(app_path);
+			log << "Now deleting the actual folder" << std::endl;
+			pThis->rmdir(strDstPath);
 
 			//	extract the downloaded file to app path
 			chdir(TECHNO_SPURS_ROOT_PATH);
-			if(pThis->extract(strFileName)) {
-				log << "FileHandler: Extracted zip file for command no " << cmdNo << std::endl;
+			if(pThis->extract(strZipFile)) {
+				log << "FileHandler: Extracted zip file: " << strZipFile << " for command no " << cmdNo << std::endl;
 				//	Send a success message, probably with a version
 				strResp	= pThis->makeRespPkt(cmdNo, strUnqId, true, "");
 				pJabberClient->sendMsgTo(strResp, cPanelJid);
