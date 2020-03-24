@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <sys/time.h>
+#include "HttpClient.h"
 #include "Constants.h"
 #include "FileLogger.h"
 
@@ -23,6 +24,9 @@ Logger &Logger:: getInstance() {
 }
 
 Logger::Logger() : bTime (true), writeLock(PTHREAD_MUTEX_INITIALIZER) {
+	pthread_t logger_thread;
+	pthread_create(&logger_thread, NULL, &run, this);
+	pthread_detach(logger_thread);
 	/*time_t now;
 	time(&now);
 	char suffix[32];
@@ -55,8 +59,9 @@ Logger &Logger::operator << (StandardEndLine manip) {
 
 	ss_log.seekg(0, std::ios::end);
 	if(ss_log.tellg() > MAX_LOG_SIZE) {
-		pushToQ(ss_log.str());
+		std::string strLog = ss_log.str();
 		ss_log.str(""); ss_log.clear();
+		pushToQ(strLog);
 	}
 	pthread_mutex_unlock(&writeLock);
 	return *this;
@@ -93,8 +98,9 @@ void Logger::pushToQ(std::string strLogData) {
 }
 
 void *Logger::run(void *pUserData) {
-	Logger *pThis = reinterpret_cast<Logger *>(pUserData);
+	Logger *pThis	= reinterpret_cast<Logger *>(pUserData);
 	std::string toUpload;
+	HttpClient *pHttpClient	= HttpClient::getInstance();
 
 	while(1) {
 		pthread_mutex_lock(&pThis->qLock);
@@ -106,7 +112,9 @@ void *Logger::run(void *pUserData) {
 		pThis->logQ.pop();
 		pthread_mutex_unlock(&pThis->qLock);
 
-		//	Write the logic to upload
+		Logger &log		= Logger::getInstance();
+		log << "Triggering log upload" << std::endl;
+		pHttpClient->uploadLog(0, toUpload);
 	}
 	return NULL;
 }
