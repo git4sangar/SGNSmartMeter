@@ -41,8 +41,8 @@
 
 //	Let all paths be suffixed with "/"
 //	Treat it as folders otherwise
-//#define TECHNO_SPURS_ROOT_PATH      "/home/pi/technospurs/"
-#define TECHNO_SPURS_ROOT_PATH      "/home/tstone10/sgn/bkup/private/projs/SGNBarc/technospurs/"
+#define TECHNO_SPURS_ROOT_PATH      "/home/pi/technospurs/"
+//#define TECHNO_SPURS_ROOT_PATH      "/home/tstone10/sgn/bkup/private/projs/SGNBarc/technospurs/"
 #define TECHNO_SPURS_CFG_FILE       "cfg/config_file.bin"
 #define TECHNO_SPURS_VERSIONS       "wdog/versions.bin"
 #define TECHNO_SPURS_CERT_FILE      "certs/cacert.pem"

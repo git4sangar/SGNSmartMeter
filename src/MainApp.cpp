@@ -19,8 +19,8 @@
 #include "FileLogger.h"
 
 int main() {
-	Logger &log = Logger::getInstance(); sleep(1);
-	log << "Starting Application" << std::endl;
+	Logger &info_log = Logger::getInstance(); sleep(1);
+	info_log << "Starting Application" << std::endl;
 
 	Config *pConfig	= Config::getInstance(); sleep(1);
 	if(!pConfig->parseXmppDetails()) {
