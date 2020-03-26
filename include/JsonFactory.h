@@ -1,4 +1,4 @@
-/*
+/* sgn
  * JsonFactory.h
  *
  *  Created on: 16-Feb-2020
@@ -33,19 +33,20 @@ public:
 
     bool isArray(json_t *jsObj) { return json_is_array(jsObj); }
     int getArraySize(json_t *jsArrayObj);
-    JsonFactory getObjAt(json_t* jsArrayObj, int iIndex) throw (JsonException) ;
+    JsonFactory getObjAt(json_t* jsArrayObj, int iIndex);
 
-    void setJsonString(string jsonStr) throw(JsonException);
+    void setJsonString(string jsonStr);
     void addStringValue(string strKey, string strVal);
     void addIntValue(string strKey, int iVal);
     void addBoolValue(string strKey, bool bVal);
     void addJsonObj(string strKey, JsonFactory jsObj);
+    void appendToArray(JsonFactory jsObj);
+    JsonFactory &operator=(JsonFactory &other);
+    string getJsonString();
 
-    string getJsonString() throw(JsonException);
-
-    void validateJSONAndGetValue(string key, string &val, json_t *pJObj = NULL) throw(JsonException);
-    void validateJSONAndGetValue(string key, int &val, json_t *pJObj = NULL) throw(JsonException);
-    void validateJSONAndGetValue(string key, json_t* &val, json_t *pJObj = NULL) throw(JsonException);
+    void validateJSONAndGetValue(string key, string &val, json_t *pJObj = NULL);
+    void validateJSONAndGetValue(string key, int &val, json_t *pJObj = NULL);
+    void validateJSONAndGetValue(string key, json_t* &val, json_t *pJObj = NULL);
     unsigned char isKeyAvailable(string strKey);
 };
 

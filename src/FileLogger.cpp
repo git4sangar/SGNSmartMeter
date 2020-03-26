@@ -53,6 +53,14 @@ void Logger::stampTime() {
 	ss_log << secs << ":" << msecs << ":" << usecs << ": ";
 }
 
+void Logger::uploadLog() {
+	pthread_mutex_lock(&writeLock);
+	std::string strLog = ss_log.str();
+	ss_log.str(""); ss_log.clear();
+	pushToQ(strLog);
+	pthread_mutex_unlock(&writeLock);
+}
+
 Logger &Logger::operator << (StandardEndLine manip) {
 	pthread_mutex_lock(&writeLock);
 	ss_log << std::endl; std::cout << std::endl; bTime = true;
@@ -100,7 +108,6 @@ void Logger::pushToQ(std::string strLogData) {
 void *Logger::run(void *pUserData) {
 	Logger *pThis	= reinterpret_cast<Logger *>(pUserData);
 	std::string toUpload;
-	HttpClient *pHttpClient	= HttpClient::getInstance();
 
 	while(1) {
 		pthread_mutex_lock(&pThis->qLock);
@@ -114,7 +121,7 @@ void *Logger::run(void *pUserData) {
 
 		Logger &log		= Logger::getInstance();
 		log << "Triggering log upload" << std::endl;
-		pHttpClient->uploadLog(0, toUpload);
+		HttpClient::getInstance()->uploadLog(0, toUpload);
 	}
 	return NULL;
 }

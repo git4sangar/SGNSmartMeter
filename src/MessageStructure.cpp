@@ -12,11 +12,11 @@
 MessageStructure::MessageStructure() {
     headers["smart_meter_update"]	= SMART_METER_UPDATE;
     headers["python_package_update"]	= PYTHON_PACKAGE_UPDATE;
-    headers["c_library_update"]		= C_LIBRARY_UPDATE;
+    headers["jabber_client_update"]	= JABBER_CLIENT_UPDATE;
     headers["watch_dog_update"]		= WATCH_DOG_UPDATE;
     headers["ca_cert_file_update"]	= CA_CERT_FILE_UPDATE;
-    headers["update_logs"]		= UPLOAD_LOGS;
-    headers["enable_log_level"]		= ENABLE_LOG_LEVEL;
+    headers["upload_logs"]		= UPLOAD_LOGS;
+    headers["version_req"]		= GET_VERSION_INFO;
     headers["reconnect_jabber"]		= XMPP_RECONNECT;
     headers["reboot_system"]		= REBOOT_SYSTEM;
     headers["heart_beat"]		= HEART_BEAT;

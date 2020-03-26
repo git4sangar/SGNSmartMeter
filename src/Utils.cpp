@@ -256,6 +256,23 @@ in_addr_t Utils::getIpv4BroadcastIpOfEthIF() {
     return mybc;
 }
 
+int Utils::prepareRecvSock(int iPort) {
+	int sockfd, optval;
+	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+	setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (const void *)&optval , sizeof(int));
+
+	//  Prepare UDP
+	struct sockaddr_in serveraddr;
+	bzero((char *) &serveraddr, sizeof(serveraddr));
+	serveraddr.sin_family       = AF_INET;
+	serveraddr.sin_addr.s_addr  = htonl(INADDR_ANY);
+	serveraddr.sin_port         = htons((unsigned short)iPort);
+
+	//  Bind the same
+	bind(sockfd, (struct sockaddr *)&serveraddr, sizeof(serveraddr));
+	return sockfd;
+}
+
 void Utils::sendPacket(int port, std::string strPacket) {
 	struct hostent *he;
 
@@ -291,6 +308,17 @@ int Utils::sendUDPPacket(in_addr_t toIp, int iPort, std::string strPayload, unsi
 
     int iRet = sendto(iSock, strPayload.c_str(), strPayload.length()+1, 0, (struct sockaddr *)&ipAddr, iLen);
     return iRet;
+}
+
+std::string Utils::getYYYYMMDD_HHMMSS() {
+	time_t now;
+	time(&now);
+	char suffix[32];
+	struct tm *local	= localtime(&now);
+	sprintf(suffix, "%04d%02d%02d_%02d%02d%02d",
+			local->tm_year+1900, local->tm_mon+1, local->tm_mday,
+			local->tm_hour, local->tm_min, local->tm_sec);
+	return std::string(suffix);
 }
 
 std::string Utils::getDotFormattedIp(in_addr_t ip) {

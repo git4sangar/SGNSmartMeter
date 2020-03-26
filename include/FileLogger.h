@@ -27,10 +27,12 @@ class Logger {
 	Logger();
 	void stampTime();
 	static Logger *pLogger;
+	static void *run(void *);
 
 public:
 
 	virtual ~Logger() {}
+	void uploadLog();
 	void pushToQ(std::string log_data);
 
 	Logger &operator<<(const std::string strLog);
@@ -44,7 +46,6 @@ public:
     Logger &operator << (StandardEndLine manip);
 
 	static Logger &getInstance();
-	static void *run(void *);
 };
 
 

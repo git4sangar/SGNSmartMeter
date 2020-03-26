@@ -28,17 +28,16 @@
 #include "JsonException.h"
 #include "Utils.h"
 
-#define MAJOR_VERSION	(1)
-#define MINOR_VERSION	(0)
-#define PATCH_VERSION	(0)
+#define JABBER_CLIENT_VERSION		(1)
 
 #define ENCRYPT_KEY     "01234567890123456789012345678901"
 #define ENCRYPT_SALT    "0123456789012345"
 
 #define ONE_KB  		(1024)
-#define ONE_MB  		(1024 * 1024)
+#define ONE_MB  		(ONE_KB * ONE_KB)
 #define WAIT_TIME_SECs	(2 * 60)
-#define HEART_BEAT_PORT	(4951)
+#define WDOG_Tx_PORT	(4951)
+#define WDOG_Rx_PORT	(4952)
 
 //	Let all paths be suffixed with "/"
 //	Treat it as folders otherwise
@@ -51,10 +50,11 @@
 #define TECHNO_SPURS_DOWNLOAD_PATH	"downloads/"
 #define TECHNO_SPURS_TEMP_DWLD_PATH	"downloads/SmartMeter"
 #define TECHNO_SPURS_APP_FOLDER		"SmartMeter"
-#define TECHNO_SPURS_LOG_FILE		"logs/jabber_client_logs.txt"
+#define TECHNO_SPURS_LOG_FILE		"logs/jabber_logs_"
 #define TECHNO_SPURS_CLIENT_FOLDER	"JabberClient"
 #define TECHNO_SPURS_CLIENT_FILE	"JabberClient/JabberClient"
 
+#define MAX_BUFF_SIZE			(10 * ONE_KB)
 #define MAX_FILE_SIZE           ONE_MB
 #define MAX_RETRY_COUNT			(3)
 #define MAX_LOG_SIZE			ONE_MB
@@ -77,7 +77,7 @@ public:
 };
 
 class Version {
-    int mjr, mnr, patch;
+    int ver;
     std::string procName;
 
 public:
@@ -86,14 +86,11 @@ public:
 
     void setProcName(std::string name) { procName = name; }
     std::string getProcName() { return procName; }
-    std::string getVerString();
+    int getVer() { return ver; }
+    std::string getVerInfo();
 
     void parseFromString(std::string strJson);
     void parseFromJsonFactory(JsonFactory jsRoot);
-
-    bool operator < (const Version &other);
-    bool operator > (const Version &other);
-    bool operator == (const Version &other);
 };
 
 class Config {
@@ -101,18 +98,19 @@ class Config {
     unsigned char *encrypt_key;     // 256 bit key
     unsigned char *encrypt_salt;    // 128 bit IV
     static Config *pConfig;
-    std::string strXmppDetails, strCurVersions, rpi_uniqId;
+    std::string strXmppDetails, rpi_uniqId, strCurVer;
     std::vector<Version> curVersions;
     XmppDetails xmpp_details;
-    Logger &log;
+    Logger &info_log;
 
 public:
     virtual ~Config();
     static Config *getInstance();
     bool readEncryptedFile(std::string strFileName, std::string &strContent);
     bool parseXmppDetails();
-    bool parseCurVersions();
-    Version getVerForProc(std::string strProcName);
+    bool parseCurVersions(std::string strCurVersions);
+    std::string getCurVersions() { return strCurVer; }
+    int getVerForProc(std::string strProcName);
 
     void setRPiUniqId(std::string _rpi_uniqId) { rpi_uniqId = _rpi_uniqId;}
     std::string getRPiUniqId() {return rpi_uniqId;}

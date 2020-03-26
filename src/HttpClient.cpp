@@ -12,12 +12,14 @@
 #include <curl/curl.h>
 #include "HttpClient.h"
 #include <sstream>
+#include <unistd.h>
+#include "JabberClient.h"
 #include "FileLogger.h"
 #include "Constants.h"
 
 HttpClient *HttpClient::pHttpClient = NULL;
 
-HttpClient :: HttpClient() : log(Logger::getInstance()) {
+HttpClient :: HttpClient() : info_log(Logger::getInstance()) {
     mtxgQ       = PTHREAD_MUTEX_INITIALIZER;
     mtxgCond    = PTHREAD_COND_INITIALIZER;
 
@@ -39,35 +41,52 @@ HttpClient :: ~HttpClient() {
     curl_global_cleanup();
 }
 
-void HttpClient::softwareUpdate(int cmdNo, std::string strUrl) {
-	if(strUrl.empty() || 0 > cmdNo) {
-		log << "HttpClient: Upload URL empty" << std::endl;
-		return;
-	}
+HttpReqPkt *HttpClient::genericUpdate(std::string strUrl, std::string strFolder, std::string strCmd, int cmdNo) {
 	HttpReqPkt *pRqPkt	= new HttpReqPkt();
 	pRqPkt->setReqType(HTTP_REQ_TYPE_DWLD);
 	pRqPkt->setUrl(strUrl);
 	pRqPkt->setTgtFile(std::string(TECHNO_SPURS_APP_FOLDER));
 	pRqPkt->setCmdNo(cmdNo);
-
-	//	Prepare the headers
+	pRqPkt->setCmd(strCmd);
 	pRqPkt->addHeader(std::string("Content-Type: application/zip"));
+	return pRqPkt;
+}
 
-	log << "HttpClient: Making software update request with CmdNo: " << cmdNo << std::endl;
+void HttpClient::smartMeterUpdate(int cmdNo, std::string strUrl) {
+	if(strUrl.empty() || 0 > cmdNo) {
+		info_log << "HttpClient: Smart meter update URL empty" << std::endl;
+		return;
+	}
+	HttpReqPkt *pRqPkt	= genericUpdate(strUrl, std::string(TECHNO_SPURS_APP_FOLDER), "smart_meter_update", cmdNo);
+	info_log << "HttpClient: Making Smart meter update request with CmdNo: " << cmdNo << std::endl;
+	pushToQ(pRqPkt);
+}
+
+void HttpClient::jabberClientUpdate(int cmdNo, std::string strUrl) {
+	if(strUrl.empty() || 0 > cmdNo) {
+		info_log << "HttpClient: Jabber client update URL empty" << std::endl;
+		return;
+	}
+	HttpReqPkt *pRqPkt	= genericUpdate(strUrl, std::string(TECHNO_SPURS_CLIENT_FOLDER), "jabber_client_update", cmdNo);
+	info_log << "HttpClient: Making Jabber client update request with CmdNo: " << cmdNo << std::endl;
 	pushToQ(pRqPkt);
 }
 
 void HttpClient::uploadLog(int cmdNo, std::string strLog) {
 	if(strLog.empty() || 0 > cmdNo) {
-		log << "HttpClient: Log content empty" << std::endl;
+		info_log << "HttpClient: Log content empty" << std::endl;
 		return;
 	}
 
 	HttpReqPkt *pRqPkt	= new HttpReqPkt();
 	pRqPkt->setReqType(HTTP_REQ_TYPE_UPLD);
 	pRqPkt->setUrl(LOG_UPLOAD_URL);
-	pRqPkt->setTgtFile(std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_LOG_FILE));
+	std::string strFile	= std::string(TECHNO_SPURS_ROOT_PATH) +
+							std::string(TECHNO_SPURS_LOG_FILE) +
+							Utils::getYYYYMMDD_HHMMSS();
+	pRqPkt->setTgtFile(strFile);
 	pRqPkt->setCmdNo(cmdNo);
+	pRqPkt->setCmd("upload_logs");
 
 	//	Prepare the headers
 	std::string strUniqID	= Config::getInstance()->getRPiUniqId();
@@ -77,7 +96,7 @@ void HttpClient::uploadLog(int cmdNo, std::string strLog) {
 
 	pRqPkt->setUserData(strLog);
 
-	log << "HttpClient: Making log upload request" << std::endl;
+	info_log << "HttpClient: Making log upload request" << std::endl;
 	pushToQ(pRqPkt);
 }
 
@@ -94,7 +113,7 @@ HttpReqPkt *HttpClient :: readFromQ() {
 	HttpReqPkt *pReqPkt;
     pthread_mutex_lock(&mtxgQ);
     if(reqQ.empty()) {
-    	log << "HttpClient: Waiting for http requests" << endl;
+    	info_log << "HttpClient: Waiting for http requests" << endl;
     	pthread_cond_wait(&mtxgCond, &mtxgQ);
     }
     pReqPkt	= reqQ.front();
@@ -114,16 +133,22 @@ void *HttpClient :: run(void *pHttpClient) {
     curl_mime *form = NULL;
 	curl_mimepart *field = NULL;
 
-    HttpClient *pThis	= reinterpret_cast<HttpClient *>(pHttpClient);
-    Logger &log		= pThis->log;
+    HttpClient *pThis		= reinterpret_cast<HttpClient *>(pHttpClient);
+    Logger &info_log		= Logger::getInstance();
+	Config *pCfg			= Config::getInstance();
+	JabberClient *pJbrCli	= JabberClient::getJabberClient();
+	XmppDetails xmpp		= pCfg->getXmppDetails();
+	std::string cPanelJid	= xmpp.getCPanelJid();
+	std::string strUnqId	= pCfg->getRPiUniqId();
+	info_log << "HttpClient: cPanel " << cPanelJid << ", UniqId " << strUnqId << std::endl;
 
-    log << "HttpClient: Curl thread started" << endl;
+    info_log << "HttpClient: Curl thread started" << endl;
 
     std::string strCAFile		= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_CERT_FILE);
     while(1) {
     	write_data = NULL; form = NULL; field = NULL; curl_hdrs	= NULL;
     	pReqPkt	= pThis->readFromQ();
-    	log << "HttpClient: Got download req" << pReqPkt->getUrl() << endl;
+    	info_log << "HttpClient: Got HTTP req " << pReqPkt->getUrl() << endl;
 
         CURL *curl      = curl_easy_init();
         if(curl && pThis->pListener) {
@@ -176,11 +201,28 @@ void *HttpClient :: run(void *pHttpClient) {
 
             CURLcode infoResp = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &respCode);
             if(CURLE_OK == res && CURLE_OK == infoResp && respCode >= 200 && respCode <= 299) {
-            	log << "HttpClient: Command No: " << pReqPkt->getCmdNo() << " success" << std::endl;
+            	info_log << "HttpClient: Command No: " << pReqPkt->getCmdNo() << " success" << std::endl;
+
+            	//	Inform the listener to unzip it
             	if(HTTP_REQ_TYPE_DWLD == pReqPkt->getReqType())
             		pThis->pListener->onDownloadSuccess(respCode, pReqPkt->getCmdNo(), pReqPkt->getTgtFile());
+
+            	//	We don't need the file anymore. So deleting the same
+            	if(HTTP_REQ_TYPE_UPLD == pReqPkt->getReqType()) {
+            		unlink(file_name.c_str());
+            		std::stringstream ss;
+            		ss << "{ \"from\" : \"" << strUnqId << "\" ,\"command\" : \""
+            				<< pReqPkt->getCmd() << "\", \"success\" : \"true\", \"command_no\" : "
+							<< pReqPkt->getCmdNo() << " }" << std::endl;
+            		pJbrCli->sendMsgTo(ss.str(), cPanelJid);
+            	}
             } else {
-            	log << "HttpClient: Error: Command No: " << pReqPkt->getCmdNo()
+            	std::stringstream ss;
+            	ss << "{ \"from\" : \"" << strUnqId << "\" ,\"command\" : \""
+					<< pReqPkt->getCmd() << "\", \"success\" : \"false\", \"command_no\" : "
+					<< pReqPkt->getCmdNo() << " }" << std::endl;
+				pJbrCli->sendMsgTo(ss.str(), cPanelJid);
+            	info_log << "HttpClient: Error: Command No: " << pReqPkt->getCmdNo()
             			<< ", res: " << res
             			<< ", infoResp: "<< infoResp
 						<< ", respCode :" << respCode << std::endl;

@@ -12,6 +12,7 @@
 #include <strophe.h>
 #include "JabberClient.h"
 #include "FileLogger.h"
+#include "Constants.h"
 
 JabberClient::JabberClient() : log(Logger::getInstance()) {
     ctx     = NULL;
@@ -27,7 +28,7 @@ JabberClient *JabberClient::pJabberClient = NULL;
 
 JabberClient *JabberClient::getJabberClient(void) {
     if(NULL == pJabberClient) {
-            pJabberClient = new JabberClient();
+        pJabberClient = new JabberClient();
     }
     return pJabberClient;
 }
@@ -42,7 +43,7 @@ int JabberClient::connect(std::string strServer, std::string strFullJid, std::st
 
     xmpp_conn_set_keepalive(conn, KA_TIMEOUT, KA_INTERVAL);
     log    << "JabberClient: Connecting xmpp server with username "
-                << strFullJid << ", password " << strPswd << std::endl;
+                << strFullJid << ", password " << "password" << std::endl;
 
     xmpp_conn_set_jid(conn, strFullJid.c_str());
     xmpp_conn_set_pass(conn, strPswd.c_str());
@@ -155,7 +156,7 @@ void JabberClient::xmppShutDown() {
 }
 
 int JabberClient::sendMsgTo(std::string strMsg, std::string toAddress) {
-    std::cout << "JabberClient:  " << strMsg << " to " << toAddress << std::endl;
+	log << "JabberClient: Sending " << strMsg << " to " << toAddress << std::endl;
     xmpp_stanza_t *reply = NULL, *body = NULL, *text = NULL;
 
     if(toAddress.empty()) {

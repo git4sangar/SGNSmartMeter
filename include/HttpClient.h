@@ -25,7 +25,7 @@
 
 class HttpReqPkt {
 	std::vector<std::string> headers;
-	std::string strUrl, strFile, strData;
+	std::string strUrl, strFile, strData, strCmd;
 	int reqType, cmdNo;
 
 public:
@@ -38,9 +38,11 @@ public:
 	int getCmdNo() { return cmdNo; }
 	std::string getUserData() { return strData; }
 	std::string getTgtFile() { return strFile; }
+	std::string getCmd() { return strCmd; }
 
 	void addHeader(std::string strHdr) { headers.push_back(strHdr); }
 	void setUrl(std::string url) { strUrl = url; }
+	void setCmd(std::string cmd) { strCmd = cmd; }
 	void setReqType(int iReqType) { reqType = iReqType; }
 	void setCmdNo(int iCmdNo) { cmdNo = iCmdNo; }
 	void setUserData(std::string strCnt) { strData = strCnt; }
@@ -49,19 +51,22 @@ public:
 
 class HttpClient {
     HttpResponse *pListener;
-    Logger &log;
+    Logger &info_log;
 
     std::queue<HttpReqPkt *> reqQ;
     pthread_mutex_t mtxgQ;
     pthread_cond_t mtxgCond;
     static HttpClient *pHttpClient;
+    static void *run(void *pThis);
+    HttpReqPkt *genericUpdate(std::string strUrl, std::string strFolder, std::string strCmd, int cmdNo);
     HttpClient();
 
 public:
     virtual ~HttpClient();
 
     void uploadLog(int cmdNo, std::string);
-    void softwareUpdate(int cmdNo, std::string strUrl);
+    void smartMeterUpdate(int cmdNo, std::string strUrl);
+    void jabberClientUpdate(int cmdNo, std::string strUrl);
 
     void subscribeListener(HttpResponse *pObj) { pListener = pObj; }
     void pushToQ(HttpReqPkt *pReqPkt);
@@ -69,7 +74,6 @@ public:
 
     static HttpClient *getInstance();
     static size_t write_function(char *ptr, size_t size, size_t nmemb, void *userdata);
-    static void *run(void *pThis);
 };
 
 

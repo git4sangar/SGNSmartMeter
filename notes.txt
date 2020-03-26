@@ -19,13 +19,22 @@ Provisioning a new RPi
                 (c) /path/to/sdcard/home/pi/technospurs/wdog
                 (d) /path/to/sdcard/home/pi/technospurs/downloads
                 (e) /path/to/sdcard/home/pi/technospurs/SmartMeter
-                (f) /path/to/sdcard/home/pi/technospurs/Monitor
+                (f) /path/to/sdcard/home/pi/technospurs/JabberClient
                 (g) /path/to/sdcard/home/pi/technospurs/logs
+				(h) /path/to/sdcard/home/pi/technospurs/
+Important Note:
+---------------
+	-> The first line of the python script shall be as follows
+		#!/usr/bin/python3.7
+	-> The script shall have execute permission set. (ls -l shall yield "-rwxr-xr-x" for that python script)
 
 (07) copy the certificates to /path/to/sdcard/home/pi/technospurs/certs/cacert.pem => I will hardcode this. If required, we can replace this file through software update
-(08) copy the python code to /path/to/sdcard/home/pi/technospurs/ (folder name is Smartmeter right?)
-(09) copy the xmpp client & watch dog server code to /path/to/sdcard/home/pi/technospurs/Monitor
-(10) encrypt the xmpp client credentials (as follows), encrypt it & save as config_file.bin and copy it to /path/to/sdcard/home/pi/technospurs/cfg
+(08) copy the python code to /path/to/sdcard/home/pi/technospurs/ (folder name is Smartmeter right?) -> make sure execute permission
+(09) copy the xmpp client & watch dog server code to /path/to/sdcard/home/pi/technospurs/JabberClient -> make sure execute permission
+(10) copy the dependencies (libxxx.so files) to /usr/local/lib
+(11) copy the watchdog server to /path/to/sdcard/home/root/ with "sudo chown root /home/root/WatchDog"
+(12) Update the cron tab for root user & pi-user
+(13) encrypt the xmpp client credentials (as follows), encrypt it & save as config_file.bin and copy it to /path/to/sdcard/home/pi/technospurs/cfg
                         {
 							"xmpp_client" : {
 								"client_jid" : "altimeter_0001@im.koderoot.net",
@@ -43,18 +52,27 @@ Provisioning a new RPi
 					(c) Symmetric Key: "01234567890123456789012345678901"
 					(d) Salt: "0123456789012345"
 
-(11) A xmpp message to trigger a download shall look like this
-	{
-		"command":"smart_meter_update",
-		"command_no" : 10,
-		"url":"https://technospurs.com/imageSets.zip",
-		"processes" :
-        [
-          {"name" : "process1","version":{"major":1, "minor":0, "patch":1}},
-          {"name" : "process2","version":{"major":1, "minor":0, "patch":1}},
-          {"name" : "process3","version":{"major":1, "minor":0, "patch":1}}
-        ]
-	}
+(14) A xmpp message to trigger a download shall look like this
+	For SmartMeter
+			{
+				"command":"smart_meter_update",
+				"command_no" : 10,
+				"url":"https://technospurs.com/imageSets.zip",
+				"processes" :
+				[
+				  {"process_name" : "process1","version":1},
+				  {"process_name" : "process2","version":1},
+				  {"process_name" : "process3","version":1}
+				]
+			}
+	
+	For JabberClient
+		{
+			"command"		: "jabber_client_update",
+			"command_no"	: 11,
+			"url"			: "https://technospurs.com/imageSets.zip",
+			"version"		: 2
+		}
 	Additional Info
 	===============
 	on unzipping, it shall yield "SmartMeter" folder with necessary sub folders
@@ -74,15 +92,43 @@ Provisioning a new RPi
 	}
 	remarks => conveys the error in case of failure
 
-(12) Hearbeat to be given to Watchdog task
+(15) Get Version Info
+		Req Packet is like this =>	{"command":"version_req"}
+		No need for command no
+		Response Packet:  {
+								"command"	: "version_req",
+								"from"		: "value of rpi_unique_id as provided in config file",
+								"processes" : [
+										{"process_name" : "process1", "version" : 1, "isDead" : false},
+										{"process_name" : "process2", "version" : 1, "isDead" : false}
+									]
+							}
+		isDead -> true means the process is not running more than a minute
+
+(16) Upload Logs
+		Req Packet is like this => {"command":"upload_logs"}
+		No need for command no
+		Response Packet:  {
+			"command"	: "upload_logs",
+			"from"		: "value of rpi_unique_id as provided in config file",
+			"success"	: true
+		}
+		
+
+(17) Hearbeat to be given to Watchdog task
 	IP: 127.0.0.1
 	UDP Port: 4951
 	{
+		"command"			: "heart_beat",
 		"process_name"		: "name of the process",
 		"pid_of_process"	: 444,
-		"run_command"		: "python3.5 /home/pi/technospurs/SmartMeter/ocr.py",
-		"version"			: { "major" : 1, "minor" : 0, "patch" : 0 }
+		"run_command"		: "/home/pi/technospurs/SmartMeter/ocr.py",
+		"version"		: 1
 	}
+	Note:
+		(01) The "run_command" shall not contain the word python3.5 instead the first line of the python script shall be "#!/usr/bin/python3.5"
+		(02) The "run_command" is name of the python script with execute permission set. (ls -l shall yield "-rwxr-xr-x" for that python script)
+	
 
 curl -X POST "http://ec2-3-135-62-120.us-east-2.compute.amazonaws.com:3000/api/panelmap" -H "accept: application/json" -H "Content-Type: application/json" -d "{ \"panel_id\": \"string\"}"
 

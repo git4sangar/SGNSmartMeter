@@ -23,6 +23,8 @@ FileHandler *FileHandler::pFileHandler = NULL;
 
 
 FileHandler :: FileHandler() : log(Logger::getInstance()){
+	qLock   = PTHREAD_MUTEX_INITIALIZER;
+	qCond   = PTHREAD_COND_INITIALIZER;
 	pthread_t file_handler_thread;
 	pthread_create(&file_handler_thread, NULL, &run, this);
 	pthread_detach(file_handler_thread);
@@ -72,7 +74,7 @@ int FileHandler::copy_data(struct archive * ar, struct archive * aw) {
     int iRetVal;
     const void * buff;
     size_t size;
-    off_t offset;
+    la_int64_t offset;
 
     for (;;) {
         iRetVal = archive_read_data_block(ar, & buff, & size, & offset);
@@ -167,7 +169,7 @@ void *FileHandler :: run(void *pUserData) {
 	std::string strDstPath, strResp, strFolder;
 	int cmdNo = 0;
 	std::pair<std::string, int> qVal;
-	Logger &log = pThis->log;
+	Logger &info_log = Logger::getInstance();
 
 	Config *pCfg				= Config::getInstance();
 	XmppDetails xmpp			= pCfg->getXmppDetails();
@@ -178,22 +180,21 @@ void *FileHandler :: run(void *pUserData) {
 	while(true) {
 		pthread_mutex_lock(&pThis->qLock);
 		if(pThis->msgQ.empty()) {
-			log << "FileHandler: Waiting for messages" << std::endl;
+			info_log << "FileHandler: Waiting for messages" << std::endl;
 			pthread_cond_wait(&pThis->qCond, &pThis->qLock);
 		}
 		qVal = pThis->msgQ.front();
 		pThis->msgQ.pop();
+		pthread_mutex_unlock(&pThis->qLock);
 
 		strFolder	= qVal.first;
 		strDstPath	= std::string(TECHNO_SPURS_ROOT_PATH) + qVal.first;
 		cmdNo		= qVal.second;
 
-		log << "FileHandler: Got a extract request" << std::endl;
-		pthread_mutex_unlock(&pThis->qLock);
-
+		info_log << "FileHandler: Got a extract request. CmdNo: " << cmdNo << ", Folder: " << strFolder << std::endl;
 		//	delete the temporary download folder where previous downloads may exist
 		std::string tmp_dwld_path	= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_DOWNLOAD_PATH) + strFolder;
-		log << "FileHandler: Deleting file " << tmp_dwld_path << std::endl;
+		info_log << "FileHandler: Deleting file " << tmp_dwld_path << std::endl;
 		pThis->rmdir(tmp_dwld_path);
 
 		//	extract the downloaded file in temp path and make sure it is extracting properly
@@ -203,16 +204,16 @@ void *FileHandler :: run(void *pUserData) {
 		chdir(dwld_path.c_str());
 		std::string strZipFile	= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_DOWNLOAD_FILE);
 		if(pThis->extract(strZipFile)) {
-			log << "FileHandler: File Extract Check: Through" << std::endl;
+			info_log << "FileHandler: File Extract Check: Through" << std::endl;
 
 			//	now delete the actual folder
-			log << "Now deleting the actual folder" << std::endl;
+			info_log << "Now deleting the actual folder" << std::endl;
 			pThis->rmdir(strDstPath);
 
 			//	extract the downloaded file to app path
 			chdir(TECHNO_SPURS_ROOT_PATH);
 			if(pThis->extract(strZipFile)) {
-				log << "FileHandler: Extracted zip file: " << strZipFile << " for command no " << cmdNo << std::endl;
+				info_log << "FileHandler: Extracted zip file: " << strZipFile << " for command no " << cmdNo << std::endl;
 				//	Send a success message, probably with a version
 				strResp	= pThis->makeRespPkt(cmdNo, strUnqId, true, "");
 				pJabberClient->sendMsgTo(strResp, cPanelJid);
@@ -220,10 +221,13 @@ void *FileHandler :: run(void *pUserData) {
 				//	Now delete the versions file & let it be created by watch dog
 				std::string strVerFile	= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_VERSIONS);
 				unlink(strVerFile.c_str());
+
+				//	Now send a reboot request to Watchdog. Just frame the JSON pkt, using JsonFactory is an overkill here
+				Utils::sendPacket(WDOG_Tx_PORT, "{\"command\":\"reboot\"}");
 			}
 		} else {
 			//	Control is not supposed to reach here. We are in bad shape now.
-			log << "FileHandler: Error: Failed extracting zip file with command no " << cmdNo << std::endl;
+			info_log << "FileHandler: Error: Failed extracting zip file with command no " << cmdNo << std::endl;
 			strResp	= pThis->makeRespPkt(cmdNo, strUnqId, false, "failed extracting zip");
 			pJabberClient->sendMsgTo(strResp, cPanelJid);
 		}

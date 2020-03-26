@@ -1,0 +1,508 @@
+sgn
+
+make depend && make _build_libs
+make[1]: Entering directory '/home/pi/sgn/dev/libsrc/openssl'
+make[1]: Leaving directory '/home/pi/sgn/dev/libsrc/openssl'
+make[1]: Entering directory '/home/pi/sgn/dev/libsrc/openssl'
+make[1]: Nothing to be done for '_build_libs'.
+make[1]: Leaving directory '/home/pi/sgn/dev/libsrc/openssl'
+*** Installing runtime libraries
+install libcrypto.so.1.1 -> /usr/local/lib/libcrypto.so.1.1
+install libssl.so.1.1 -> /usr/local/lib/libssl.so.1.1
+*** Installing development files
+created directory `/usr/local/include/openssl'
+install ./include/openssl/aes.h -> /usr/local/include/openssl/aes.h
+install ./include/openssl/asn1.h -> /usr/local/include/openssl/asn1.h
+install ./include/openssl/asn1_mac.h -> /usr/local/include/openssl/asn1_mac.h
+install ./include/openssl/asn1err.h -> /usr/local/include/openssl/asn1err.h
+install ./include/openssl/asn1t.h -> /usr/local/include/openssl/asn1t.h
+install ./include/openssl/async.h -> /usr/local/include/openssl/async.h
+install ./include/openssl/asyncerr.h -> /usr/local/include/openssl/asyncerr.h
+install ./include/openssl/bio.h -> /usr/local/include/openssl/bio.h
+install ./include/openssl/bioerr.h -> /usr/local/include/openssl/bioerr.h
+install ./include/openssl/blowfish.h -> /usr/local/include/openssl/blowfish.h
+install ./include/openssl/bn.h -> /usr/local/include/openssl/bn.h
+install ./include/openssl/bnerr.h -> /usr/local/include/openssl/bnerr.h
+install ./include/openssl/buffer.h -> /usr/local/include/openssl/buffer.h
+install ./include/openssl/buffererr.h -> /usr/local/include/openssl/buffererr.h
+install ./include/openssl/camellia.h -> /usr/local/include/openssl/camellia.h
+install ./include/openssl/cast.h -> /usr/local/include/openssl/cast.h
+install ./include/openssl/cmac.h -> /usr/local/include/openssl/cmac.h
+install ./include/openssl/cms.h -> /usr/local/include/openssl/cms.h
+install ./include/openssl/cmserr.h -> /usr/local/include/openssl/cmserr.h
+install ./include/openssl/comp.h -> /usr/local/include/openssl/comp.h
+install ./include/openssl/comperr.h -> /usr/local/include/openssl/comperr.h
+install ./include/openssl/conf.h -> /usr/local/include/openssl/conf.h
+install ./include/openssl/conf_api.h -> /usr/local/include/openssl/conf_api.h
+install ./include/openssl/conferr.h -> /usr/local/include/openssl/conferr.h
+install ./include/openssl/crypto.h -> /usr/local/include/openssl/crypto.h
+install ./include/openssl/cryptoerr.h -> /usr/local/include/openssl/cryptoerr.h
+install ./include/openssl/ct.h -> /usr/local/include/openssl/ct.h
+install ./include/openssl/cterr.h -> /usr/local/include/openssl/cterr.h
+install ./include/openssl/des.h -> /usr/local/include/openssl/des.h
+install ./include/openssl/dh.h -> /usr/local/include/openssl/dh.h
+install ./include/openssl/dherr.h -> /usr/local/include/openssl/dherr.h
+install ./include/openssl/dsa.h -> /usr/local/include/openssl/dsa.h
+install ./include/openssl/dsaerr.h -> /usr/local/include/openssl/dsaerr.h
+install ./include/openssl/dtls1.h -> /usr/local/include/openssl/dtls1.h
+install ./include/openssl/e_os2.h -> /usr/local/include/openssl/e_os2.h
+install ./include/openssl/ebcdic.h -> /usr/local/include/openssl/ebcdic.h
+install ./include/openssl/ec.h -> /usr/local/include/openssl/ec.h
+install ./include/openssl/ecdh.h -> /usr/local/include/openssl/ecdh.h
+install ./include/openssl/ecdsa.h -> /usr/local/include/openssl/ecdsa.h
+install ./include/openssl/ecerr.h -> /usr/local/include/openssl/ecerr.h
+install ./include/openssl/engine.h -> /usr/local/include/openssl/engine.h
+install ./include/openssl/engineerr.h -> /usr/local/include/openssl/engineerr.h
+install ./include/openssl/err.h -> /usr/local/include/openssl/err.h
+install ./include/openssl/evp.h -> /usr/local/include/openssl/evp.h
+install ./include/openssl/evperr.h -> /usr/local/include/openssl/evperr.h
+install ./include/openssl/hmac.h -> /usr/local/include/openssl/hmac.h
+install ./include/openssl/idea.h -> /usr/local/include/openssl/idea.h
+install ./include/openssl/kdf.h -> /usr/local/include/openssl/kdf.h
+install ./include/openssl/kdferr.h -> /usr/local/include/openssl/kdferr.h
+install ./include/openssl/lhash.h -> /usr/local/include/openssl/lhash.h
+install ./include/openssl/md2.h -> /usr/local/include/openssl/md2.h
+install ./include/openssl/md4.h -> /usr/local/include/openssl/md4.h
+install ./include/openssl/md5.h -> /usr/local/include/openssl/md5.h
+install ./include/openssl/mdc2.h -> /usr/local/include/openssl/mdc2.h
+install ./include/openssl/modes.h -> /usr/local/include/openssl/modes.h
+install ./include/openssl/obj_mac.h -> /usr/local/include/openssl/obj_mac.h
+install ./include/openssl/objects.h -> /usr/local/include/openssl/objects.h
+install ./include/openssl/objectserr.h -> /usr/local/include/openssl/objectserr.h
+install ./include/openssl/ocsp.h -> /usr/local/include/openssl/ocsp.h
+install ./include/openssl/ocsperr.h -> /usr/local/include/openssl/ocsperr.h
+install ./include/openssl/opensslconf.h -> /usr/local/include/openssl/opensslconf.h
+install ./include/openssl/opensslv.h -> /usr/local/include/openssl/opensslv.h
+install ./include/openssl/ossl_typ.h -> /usr/local/include/openssl/ossl_typ.h
+install ./include/openssl/pem.h -> /usr/local/include/openssl/pem.h
+install ./include/openssl/pem2.h -> /usr/local/include/openssl/pem2.h
+install ./include/openssl/pemerr.h -> /usr/local/include/openssl/pemerr.h
+install ./include/openssl/pkcs12.h -> /usr/local/include/openssl/pkcs12.h
+install ./include/openssl/pkcs12err.h -> /usr/local/include/openssl/pkcs12err.h
+install ./include/openssl/pkcs7.h -> /usr/local/include/openssl/pkcs7.h
+install ./include/openssl/pkcs7err.h -> /usr/local/include/openssl/pkcs7err.h
+install ./include/openssl/rand.h -> /usr/local/include/openssl/rand.h
+install ./include/openssl/rand_drbg.h -> /usr/local/include/openssl/rand_drbg.h
+install ./include/openssl/randerr.h -> /usr/local/include/openssl/randerr.h
+install ./include/openssl/rc2.h -> /usr/local/include/openssl/rc2.h
+install ./include/openssl/rc4.h -> /usr/local/include/openssl/rc4.h
+install ./include/openssl/rc5.h -> /usr/local/include/openssl/rc5.h
+install ./include/openssl/ripemd.h -> /usr/local/include/openssl/ripemd.h
+install ./include/openssl/rsa.h -> /usr/local/include/openssl/rsa.h
+install ./include/openssl/rsaerr.h -> /usr/local/include/openssl/rsaerr.h
+install ./include/openssl/safestack.h -> /usr/local/include/openssl/safestack.h
+install ./include/openssl/seed.h -> /usr/local/include/openssl/seed.h
+install ./include/openssl/sha.h -> /usr/local/include/openssl/sha.h
+install ./include/openssl/srp.h -> /usr/local/include/openssl/srp.h
+install ./include/openssl/srtp.h -> /usr/local/include/openssl/srtp.h
+install ./include/openssl/ssl.h -> /usr/local/include/openssl/ssl.h
+install ./include/openssl/ssl2.h -> /usr/local/include/openssl/ssl2.h
+install ./include/openssl/ssl3.h -> /usr/local/include/openssl/ssl3.h
+install ./include/openssl/sslerr.h -> /usr/local/include/openssl/sslerr.h
+install ./include/openssl/stack.h -> /usr/local/include/openssl/stack.h
+install ./include/openssl/store.h -> /usr/local/include/openssl/store.h
+install ./include/openssl/storeerr.h -> /usr/local/include/openssl/storeerr.h
+install ./include/openssl/symhacks.h -> /usr/local/include/openssl/symhacks.h
+install ./include/openssl/tls1.h -> /usr/local/include/openssl/tls1.h
+install ./include/openssl/ts.h -> /usr/local/include/openssl/ts.h
+install ./include/openssl/tserr.h -> /usr/local/include/openssl/tserr.h
+install ./include/openssl/txt_db.h -> /usr/local/include/openssl/txt_db.h
+install ./include/openssl/ui.h -> /usr/local/include/openssl/ui.h
+install ./include/openssl/uierr.h -> /usr/local/include/openssl/uierr.h
+install ./include/openssl/whrlpool.h -> /usr/local/include/openssl/whrlpool.h
+install ./include/openssl/x509.h -> /usr/local/include/openssl/x509.h
+install ./include/openssl/x509_vfy.h -> /usr/local/include/openssl/x509_vfy.h
+install ./include/openssl/x509err.h -> /usr/local/include/openssl/x509err.h
+install ./include/openssl/x509v3.h -> /usr/local/include/openssl/x509v3.h
+install ./include/openssl/x509v3err.h -> /usr/local/include/openssl/x509v3err.h
+install ./include/openssl/aes.h -> /usr/local/include/openssl/aes.h
+install ./include/openssl/asn1.h -> /usr/local/include/openssl/asn1.h
+install ./include/openssl/asn1_mac.h -> /usr/local/include/openssl/asn1_mac.h
+install ./include/openssl/asn1err.h -> /usr/local/include/openssl/asn1err.h
+install ./include/openssl/asn1t.h -> /usr/local/include/openssl/asn1t.h
+install ./include/openssl/async.h -> /usr/local/include/openssl/async.h
+install ./include/openssl/asyncerr.h -> /usr/local/include/openssl/asyncerr.h
+install ./include/openssl/bio.h -> /usr/local/include/openssl/bio.h
+install ./include/openssl/bioerr.h -> /usr/local/include/openssl/bioerr.h
+install ./include/openssl/blowfish.h -> /usr/local/include/openssl/blowfish.h
+install ./include/openssl/bn.h -> /usr/local/include/openssl/bn.h
+install ./include/openssl/bnerr.h -> /usr/local/include/openssl/bnerr.h
+install ./include/openssl/buffer.h -> /usr/local/include/openssl/buffer.h
+install ./include/openssl/buffererr.h -> /usr/local/include/openssl/buffererr.h
+install ./include/openssl/camellia.h -> /usr/local/include/openssl/camellia.h
+install ./include/openssl/cast.h -> /usr/local/include/openssl/cast.h
+install ./include/openssl/cmac.h -> /usr/local/include/openssl/cmac.h
+install ./include/openssl/cms.h -> /usr/local/include/openssl/cms.h
+install ./include/openssl/cmserr.h -> /usr/local/include/openssl/cmserr.h
+install ./include/openssl/comp.h -> /usr/local/include/openssl/comp.h
+install ./include/openssl/comperr.h -> /usr/local/include/openssl/comperr.h
+install ./include/openssl/conf.h -> /usr/local/include/openssl/conf.h
+install ./include/openssl/conf_api.h -> /usr/local/include/openssl/conf_api.h
+install ./include/openssl/conferr.h -> /usr/local/include/openssl/conferr.h
+install ./include/openssl/crypto.h -> /usr/local/include/openssl/crypto.h
+install ./include/openssl/cryptoerr.h -> /usr/local/include/openssl/cryptoerr.h
+install ./include/openssl/ct.h -> /usr/local/include/openssl/ct.h
+install ./include/openssl/cterr.h -> /usr/local/include/openssl/cterr.h
+install ./include/openssl/des.h -> /usr/local/include/openssl/des.h
+install ./include/openssl/dh.h -> /usr/local/include/openssl/dh.h
+install ./include/openssl/dherr.h -> /usr/local/include/openssl/dherr.h
+install ./include/openssl/dsa.h -> /usr/local/include/openssl/dsa.h
+install ./include/openssl/dsaerr.h -> /usr/local/include/openssl/dsaerr.h
+install ./include/openssl/dtls1.h -> /usr/local/include/openssl/dtls1.h
+install ./include/openssl/e_os2.h -> /usr/local/include/openssl/e_os2.h
+install ./include/openssl/ebcdic.h -> /usr/local/include/openssl/ebcdic.h
+install ./include/openssl/ec.h -> /usr/local/include/openssl/ec.h
+install ./include/openssl/ecdh.h -> /usr/local/include/openssl/ecdh.h
+install ./include/openssl/ecdsa.h -> /usr/local/include/openssl/ecdsa.h
+install ./include/openssl/ecerr.h -> /usr/local/include/openssl/ecerr.h
+install ./include/openssl/engine.h -> /usr/local/include/openssl/engine.h
+install ./include/openssl/engineerr.h -> /usr/local/include/openssl/engineerr.h
+install ./include/openssl/err.h -> /usr/local/include/openssl/err.h
+install ./include/openssl/evp.h -> /usr/local/include/openssl/evp.h
+install ./include/openssl/evperr.h -> /usr/local/include/openssl/evperr.h
+install ./include/openssl/hmac.h -> /usr/local/include/openssl/hmac.h
+install ./include/openssl/idea.h -> /usr/local/include/openssl/idea.h
+install ./include/openssl/kdf.h -> /usr/local/include/openssl/kdf.h
+install ./include/openssl/kdferr.h -> /usr/local/include/openssl/kdferr.h
+install ./include/openssl/lhash.h -> /usr/local/include/openssl/lhash.h
+install ./include/openssl/md2.h -> /usr/local/include/openssl/md2.h
+install ./include/openssl/md4.h -> /usr/local/include/openssl/md4.h
+install ./include/openssl/md5.h -> /usr/local/include/openssl/md5.h
+install ./include/openssl/mdc2.h -> /usr/local/include/openssl/mdc2.h
+install ./include/openssl/modes.h -> /usr/local/include/openssl/modes.h
+install ./include/openssl/obj_mac.h -> /usr/local/include/openssl/obj_mac.h
+install ./include/openssl/objects.h -> /usr/local/include/openssl/objects.h
+install ./include/openssl/objectserr.h -> /usr/local/include/openssl/objectserr.h
+install ./include/openssl/ocsp.h -> /usr/local/include/openssl/ocsp.h
+install ./include/openssl/ocsperr.h -> /usr/local/include/openssl/ocsperr.h
+install ./include/openssl/opensslconf.h -> /usr/local/include/openssl/opensslconf.h
+install ./include/openssl/opensslv.h -> /usr/local/include/openssl/opensslv.h
+install ./include/openssl/ossl_typ.h -> /usr/local/include/openssl/ossl_typ.h
+install ./include/openssl/pem.h -> /usr/local/include/openssl/pem.h
+install ./include/openssl/pem2.h -> /usr/local/include/openssl/pem2.h
+install ./include/openssl/pemerr.h -> /usr/local/include/openssl/pemerr.h
+install ./include/openssl/pkcs12.h -> /usr/local/include/openssl/pkcs12.h
+install ./include/openssl/pkcs12err.h -> /usr/local/include/openssl/pkcs12err.h
+install ./include/openssl/pkcs7.h -> /usr/local/include/openssl/pkcs7.h
+install ./include/openssl/pkcs7err.h -> /usr/local/include/openssl/pkcs7err.h
+install ./include/openssl/rand.h -> /usr/local/include/openssl/rand.h
+install ./include/openssl/rand_drbg.h -> /usr/local/include/openssl/rand_drbg.h
+install ./include/openssl/randerr.h -> /usr/local/include/openssl/randerr.h
+install ./include/openssl/rc2.h -> /usr/local/include/openssl/rc2.h
+install ./include/openssl/rc4.h -> /usr/local/include/openssl/rc4.h
+install ./include/openssl/rc5.h -> /usr/local/include/openssl/rc5.h
+install ./include/openssl/ripemd.h -> /usr/local/include/openssl/ripemd.h
+install ./include/openssl/rsa.h -> /usr/local/include/openssl/rsa.h
+install ./include/openssl/rsaerr.h -> /usr/local/include/openssl/rsaerr.h
+install ./include/openssl/safestack.h -> /usr/local/include/openssl/safestack.h
+install ./include/openssl/seed.h -> /usr/local/include/openssl/seed.h
+install ./include/openssl/sha.h -> /usr/local/include/openssl/sha.h
+install ./include/openssl/srp.h -> /usr/local/include/openssl/srp.h
+install ./include/openssl/srtp.h -> /usr/local/include/openssl/srtp.h
+install ./include/openssl/ssl.h -> /usr/local/include/openssl/ssl.h
+install ./include/openssl/ssl2.h -> /usr/local/include/openssl/ssl2.h
+install ./include/openssl/ssl3.h -> /usr/local/include/openssl/ssl3.h
+install ./include/openssl/sslerr.h -> /usr/local/include/openssl/sslerr.h
+install ./include/openssl/stack.h -> /usr/local/include/openssl/stack.h
+install ./include/openssl/store.h -> /usr/local/include/openssl/store.h
+install ./include/openssl/storeerr.h -> /usr/local/include/openssl/storeerr.h
+install ./include/openssl/symhacks.h -> /usr/local/include/openssl/symhacks.h
+install ./include/openssl/tls1.h -> /usr/local/include/openssl/tls1.h
+install ./include/openssl/ts.h -> /usr/local/include/openssl/ts.h
+install ./include/openssl/tserr.h -> /usr/local/include/openssl/tserr.h
+install ./include/openssl/txt_db.h -> /usr/local/include/openssl/txt_db.h
+install ./include/openssl/ui.h -> /usr/local/include/openssl/ui.h
+install ./include/openssl/uierr.h -> /usr/local/include/openssl/uierr.h
+install ./include/openssl/whrlpool.h -> /usr/local/include/openssl/whrlpool.h
+install ./include/openssl/x509.h -> /usr/local/include/openssl/x509.h
+install ./include/openssl/x509_vfy.h -> /usr/local/include/openssl/x509_vfy.h
+install ./include/openssl/x509err.h -> /usr/local/include/openssl/x509err.h
+install ./include/openssl/x509v3.h -> /usr/local/include/openssl/x509v3.h
+install ./include/openssl/x509v3err.h -> /usr/local/include/openssl/x509v3err.h
+install libcrypto.a -> /usr/local/lib/libcrypto.a
+install libssl.a -> /usr/local/lib/libssl.a
+link /usr/local/lib/libcrypto.so -> /usr/local/lib/libcrypto.so.1.1
+link /usr/local/lib/libssl.so -> /usr/local/lib/libssl.so.1.1
+created directory `/usr/local/lib/pkgconfig'
+install libcrypto.pc -> /usr/local/lib/pkgconfig/libcrypto.pc
+install libssl.pc -> /usr/local/lib/pkgconfig/libssl.pc
+install openssl.pc -> /usr/local/lib/pkgconfig/openssl.pc
+make depend && make _build_engines
+make[1]: Entering directory '/home/pi/sgn/dev/libsrc/openssl'
+make[1]: Leaving directory '/home/pi/sgn/dev/libsrc/openssl'
+make[1]: Entering directory '/home/pi/sgn/dev/libsrc/openssl'
+make[1]: Nothing to be done for '_build_engines'.
+make[1]: Leaving directory '/home/pi/sgn/dev/libsrc/openssl'
+created directory `/usr/local/lib/engines-1.1'
+*** Installing engines
+install engines/afalg.so -> /usr/local/lib/engines-1.1/afalg.so
+install engines/capi.so -> /usr/local/lib/engines-1.1/capi.so
+install engines/padlock.so -> /usr/local/lib/engines-1.1/padlock.so
+make depend && make _build_programs
+make[1]: Entering directory '/home/pi/sgn/dev/libsrc/openssl'
+make[1]: Leaving directory '/home/pi/sgn/dev/libsrc/openssl'
+make[1]: Entering directory '/home/pi/sgn/dev/libsrc/openssl'
+make[1]: Nothing to be done for '_build_programs'.
+make[1]: Leaving directory '/home/pi/sgn/dev/libsrc/openssl'
+*** Installing runtime programs
+install apps/openssl -> /usr/local/bin/openssl
+install ./tools/c_rehash -> /usr/local/bin/c_rehash
+created directory `/usr/local/ssl'
+created directory `/usr/local/ssl/certs'
+created directory `/usr/local/ssl/private'
+created directory `/usr/local/ssl/misc'
+install ./apps/CA.pl -> /usr/local/ssl/misc/CA.pl
+install ./apps/tsget.pl -> /usr/local/ssl/misc/tsget.pl
+link /usr/local/ssl/misc/tsget -> /usr/local/ssl/misc/tsget.pl
+install ./apps/openssl.cnf -> /usr/local/ssl/openssl.cnf.dist
+install ./apps/openssl.cnf -> /usr/local/ssl/openssl.cnf
+install ./apps/ct_log_list.cnf -> /usr/local/ssl/ct_log_list.cnf.dist
+install ./apps/ct_log_list.cnf -> /usr/local/ssl/ct_log_list.cnf
+*** Installing manpages
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+configure: Configured to build curl/libcurl:
+
+  Host setup:       armv7l-unknown-linux-gnueabihf
+  Install prefix:   /usr/local
+  Compiler:         gcc
+   CFLAGS:          -Werror-implicit-function-declaration -O2 -Wno-system-headers -pthread
+   CPPFLAGS:        -I/usr/local/include
+   LDFLAGS:         -L/usr/local/lib
+   LIBS:            -lssl -lcrypto -lssl -lcrypto -lz
+
+  curl version:     7.68.0-DEV
+  SSL:              enabled (OpenSSL)
+  SSH:              no      (--with-{libssh,libssh2})
+  zlib:             enabled
+  brotli:           no      (--with-brotli)
+  GSS-API:          no      (--with-gssapi)
+  TLS-SRP:          enabled
+  resolver:         POSIX threaded
+  IPv6:             enabled
+  Unix sockets:     enabled
+  IDN:              no      (--with-{libidn2,winidn})
+  Build libcurl:    Shared=yes, Static=yes
+  Built-in manual:  enabled
+  --libcurl option: enabled (--disable-libcurl-option)
+  Verbose errors:   enabled (--disable-verbose)
+  Code coverage:    disabled
+  SSPI:             no      (--enable-sspi)
+  ca cert bundle:   /etc/ssl/certs/ca-certificates.crt
+  ca cert path:     no
+  ca fallback:      no
+  LDAP:             no      (--enable-ldap / --with-ldap-lib / --with-lber-lib)
+  LDAPS:            no      (--enable-ldaps)
+  RTSP:             enabled
+  RTMP:             no      (--with-librtmp)
+  Metalink:         no      (--with-libmetalink)
+  PSL:              no      (libpsl not found)
+  Alt-svc:          no      (--enable-alt-svc)
+  HTTP2:            disabled (--with-nghttp2)
+  HTTP3:            disabled (--with-ngtcp2, --with-quiche)
+  ESNI:             no      (--enable-esni)
+  Protocols:        DICT FILE FTP FTPS GOPHER HTTP HTTPS IMAP IMAPS POP3 POP3S RTSP SMB SMBS SMTP SMTPS TELNET TFTP
+  Features:         SSL IPv6 UnixSockets libz AsynchDNS NTLM NTLM_WB TLS-SRP HTTPS-proxy
+
+
+pi@raspberrypi:~/sgn/dev/libsrc/curl $ sudo make install
+Making install in lib
+make[1]: Entering directory '/home/pi/sgn/dev/libsrc/curl/lib'
+make[2]: Entering directory '/home/pi/sgn/dev/libsrc/curl/lib'
+ /bin/mkdir -p '/usr/local/lib'
+ /bin/bash ../libtool   --mode=install /usr/bin/install -c   libcurl.la '/usr/local/lib'
+libtool: install: /usr/bin/install -c .libs/libcurl.so.4.6.0 /usr/local/lib/libcurl.so.4.6.0
+libtool: install: (cd /usr/local/lib && { ln -s -f libcurl.so.4.6.0 libcurl.so.4 || { rm -f libcurl.so.4 && ln -s libcurl.so.4.6.0 libcurl.so.4; }; })
+libtool: install: (cd /usr/local/lib && { ln -s -f libcurl.so.4.6.0 libcurl.so || { rm -f libcurl.so && ln -s libcurl.so.4.6.0 libcurl.so; }; })
+libtool: install: /usr/bin/install -c .libs/libcurl.lai /usr/local/lib/libcurl.la
+libtool: install: /usr/bin/install -c .libs/libcurl.a /usr/local/lib/libcurl.a
+libtool: install: chmod 644 /usr/local/lib/libcurl.a
+libtool: install: ranlib /usr/local/lib/libcurl.a
+libtool: finish: PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/sbin" ldconfig -n /usr/local/lib
+----------------------------------------------------------------------
+Libraries have been installed in:
+   /usr/local/lib
+
+If you ever happen to want to link against installed libraries
+in a given directory, LIBDIR, you must either use libtool, and
+specify the full pathname of the library, or use the '-LLIBDIR'
+flag during linking and do at least one of the following:
+   - add LIBDIR to the 'LD_LIBRARY_PATH' environment variable
+     during execution
+   - add LIBDIR to the 'LD_RUN_PATH' environment variable
+     during linking
+   - use the '-Wl,-rpath -Wl,LIBDIR' linker flag
+   - have your system administrator add LIBDIR to '/etc/ld.so.conf'
+
+See any operating system documentation about shared libraries for
+more information, such as the ld(1) and ld.so(8) manual pages.
+----------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Install the project...
+-- Install configuration: ""
+-- Installing: /usr/local/lib/libjansson.a
+-- Installing: /usr/local/include/jansson_config.h
+-- Installing: /usr/local/include/jansson.h
+-- Installing: /usr/local/lib/pkgconfig/jansson.pc
+-- Installing: /usr/local/lib/cmake/jansson/janssonConfig.cmake
+-- Installing: /usr/local/lib/cmake/jansson/janssonConfigVersion.cmake
+-- Installing: /usr/local/lib/cmake/jansson/janssonTargets.cmake
+-- Installing: /usr/local/lib/cmake/jansson/janssonTargets-noconfig.cmake
+
+
+
+
+
+
+
+pi@raspberrypi:~/sgn/dev/libsrc/libarchive $ sudo make install
+make  install-am
+make[1]: Entering directory '/home/pi/sgn/dev/libsrc/libarchive'
+make[2]: Entering directory '/home/pi/sgn/dev/libsrc/libarchive'
+ /bin/mkdir -p '/usr/local/lib'
+ /bin/bash ./libtool   --mode=install /usr/bin/install -c   libarchive.la '/usr/local/lib'
+libtool: install: /usr/bin/install -c .libs/libarchive.so.13.4.2 /usr/local/lib/libarchive.so.13.4.2
+libtool: install: (cd /usr/local/lib && { ln -s -f libarchive.so.13.4.2 libarchive.so.13 || { rm -f libarchive.so.13 && ln -s libarchive.so.13.4.2 libarchive.so.13; }; })
+libtool: install: (cd /usr/local/lib && { ln -s -f libarchive.so.13.4.2 libarchive.so || { rm -f libarchive.so && ln -s libarchive.so.13.4.2 libarchive.so; }; })
+libtool: install: /usr/bin/install -c .libs/libarchive.lai /usr/local/lib/libarchive.la
+libtool: install: /usr/bin/install -c .libs/libarchive.a /usr/local/lib/libarchive.a
+libtool: install: chmod 644 /usr/local/lib/libarchive.a
+libtool: install: ranlib /usr/local/lib/libarchive.a
+libtool: finish: PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/sbin" ldconfig -n /usr/local/lib
+----------------------------------------------------------------------
+Libraries have been installed in:
+   /usr/local/lib
+
+If you ever happen to want to link against installed libraries
+in a given directory, LIBDIR, you must either use libtool, and
+specify the full pathname of the library, or use the '-LLIBDIR'
+flag during linking and do at least one of the following:
+   - add LIBDIR to the 'LD_LIBRARY_PATH' environment variable
+     during execution
+   - add LIBDIR to the 'LD_RUN_PATH' environment variable
+     during linking
+   - use the '-Wl,-rpath -Wl,LIBDIR' linker flag
+   - have your system administrator add LIBDIR to '/etc/ld.so.conf'
+
+See any operating system documentation about shared libraries for
+more information, such as the ld(1) and ld.so(8) manual pages.
+----------------------------------------------------------------------
+
+
+
+
+
+
+
+----------------------------------------------------------------------
+Libraries have been installed in:
+   /usr/local/lib
+
+If you ever happen to want to link against installed libraries
+in a given directory, LIBDIR, you must either use libtool, and
+specify the full pathname of the library, or use the '-LLIBDIR'
+flag during linking and do at least one of the following:
+   - add LIBDIR to the 'LD_LIBRARY_PATH' environment variable
+     during execution
+   - add LIBDIR to the 'LD_RUN_PATH' environment variable
+     during linking
+   - use the '-Wl,-rpath -Wl,LIBDIR' linker flag
+   - have your system administrator add LIBDIR to '/etc/ld.so.conf'
+
+See any operating system documentation about shared libraries for
+more information, such as the ld(1) and ld.so(8) manual pages.
+----------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+libtool: finish: PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/sbin" ldconfig -n /usr/lib/python2.7/dist-packages
+----------------------------------------------------------------------
+Libraries have been installed in:
+   /usr/lib/python2.7/dist-packages
+
+If you ever happen to want to link against installed libraries
+in a given directory, LIBDIR, you must either use libtool, and
+specify the full pathname of the library, or use the '-LLIBDIR'
+flag during linking and do at least one of the following:
+   - add LIBDIR to the 'LD_LIBRARY_PATH' environment variable
+     during execution
+   - add LIBDIR to the 'LD_RUN_PATH' environment variable
+     during linking
+   - use the '-Wl,-rpath -Wl,LIBDIR' linker flag
+   - have your system administrator add LIBDIR to '/etc/ld.so.conf'
+
+See any operating system documentation about shared libraries for
+more information, such as the ld(1) and ld.so(8) manual pages.
+----------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+----------------------------------------------------------------------
+Libraries have been installed in:
+   /usr/local/lib
+
+If you ever happen to want to link against installed libraries
+in a given directory, LIBDIR, you must either use libtool, and
+specify the full pathname of the library, or use the '-LLIBDIR'
+flag during linking and do at least one of the following:
+   - add LIBDIR to the 'LD_LIBRARY_PATH' environment variable
+     during execution
+   - add LIBDIR to the 'LD_RUN_PATH' environment variable
+     during linking
+   - use the '-Wl,-rpath -Wl,LIBDIR' linker flag
+   - have your system administrator add LIBDIR to '/etc/ld.so.conf'
+
+See any operating system documentation about shared libraries for
+more information, such as the ld(1) and ld.so(8) manual pages.
+----------------------------------------------------------------------
+
+
+
+
+
+
+
+

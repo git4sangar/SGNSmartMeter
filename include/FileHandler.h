@@ -26,6 +26,7 @@ class FileHandler {
     std::string makeRespPkt(int cmdNo, std::string strFrom, bool isSucces, std::string strRemarks);
 
 	static FileHandler *pFileHandler;
+	static void *run(void *pUserData);
 	FileHandler();
 
 public:
@@ -35,7 +36,6 @@ public:
 	bool extract(std::string filename);
 
 	static FileHandler *getInstance();
-	static void *run(void *pUserData);
 };
 
 

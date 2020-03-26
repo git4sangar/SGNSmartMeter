@@ -18,7 +18,7 @@
 
 Config *Config::pConfig = NULL;
 
-Config::Config() : log(Logger::getInstance()){
+Config::Config() : info_log(Logger::getInstance()){
     encrypt_key     = (unsigned char *) strdup(ENCRYPT_KEY);  // 256 bit key
     encrypt_salt    = (unsigned char *) strdup(ENCRYPT_SALT); // 128 bit IV
 }
@@ -39,16 +39,10 @@ bool Config::readEncryptedFile(std::string file_name, std::string &strContent) {
     FILE *fp = NULL;
     unsigned char *cipher_text  = NULL;
     unsigned char *plain_text   = NULL;
-    int cipher_len = 0, iRetryCount = 0;
+    int cipher_len = 0;
     bool bRet       = false;
 
-    fp = NULL;
-    while(iRetryCount < MAX_RETRY_COUNT && NULL == fp) {
-        fp = fopen(file_name.c_str(), "rb");
-        iRetryCount++;
-        sleep(1);
-    }
-
+    fp = fopen(file_name.c_str(), "rb");
     if(NULL != fp) {
         cipher_text = (unsigned char *) malloc(MAX_FILE_SIZE);
         plain_text  = (unsigned char *) malloc(MAX_FILE_SIZE);
@@ -84,7 +78,7 @@ bool Config::parseXmppDetails() {
 
     std::string strCfgFile	= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_CFG_FILE);
     if(!readEncryptedFile(strCfgFile, strXmppDetails)) {
-        log << "Config: Error: Reading encrypted-config file" << std::endl;
+        info_log << "Config: Error: Reading encrypted-config file" << std::endl;
         return false;
     }
 
@@ -105,10 +99,10 @@ bool Config::parseXmppDetails() {
             xmpp_details.setCPanelJid(cpanel_jid);
 
             bRet = true;
-            log << "Config: Parsed xmpp details: " << xmpp_details.toString() << std::endl;
-            log << "Config: RPi UniqID: " << rpi_uniqId << std::endl;
+            info_log << "Config: Parsed xmpp details: " << xmpp_details.toString() << std::endl;
+            info_log << "Config: RPi UniqID: " << rpi_uniqId << std::endl;
         } catch(JsonException &jed) {
-            log << "Config: Error: Parsing xmpp details failed" << std::endl;
+            info_log << "Config: Error: Parsing xmpp details failed" << std::endl;
             std::cout << jed.what() << std::endl;
             bRet = false;
         }
@@ -117,46 +111,50 @@ bool Config::parseXmppDetails() {
 }
 
 
-/*{
-  "processes" :
-    [
-      {"name" : "process1", "pid":213, "version":{"major":1, "minor":0, "patch":0}},
-      {"name" : "process2", "pid":812, "version":{"major":1, "minor":0, "patch":0}}
-    ]
-}*/
+/*
+ * {
+ *		"command" : "version_req",
+ *      "processes" : [
+ *              {"process_name" : "process1", "version" : 1, "isDead" : false},
+ *              {"process_name" : "process2", "version" : 1, "isDead" : false}
+ *           ]
+ * }
+ */
 
-bool Config::parseCurVersions() {
+bool Config::parseCurVersions(std::string strCurVersions) {
     std::string strProcName;
     Version procVer;
-    std::string strVerFile	= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_VERSIONS);
-    if(!readEncryptedFile(strVerFile, strCurVersions)) {
-        log << "Config: Error: Reading encrypted-versions file" << std::endl;
-        return false;
-    }
     JsonFactory jsRoot;
     json_t *jsProcs;
     int iLoop = 0;
+
     try {
         jsRoot.setJsonString(strCurVersions);
+        //	Take a copy for sending it to cpanel
+		jsRoot.addStringValue("from", rpi_uniqId);
+		strCurVer	= jsRoot.getJsonString();
+
         jsRoot.validateJSONAndGetValue("processes", jsProcs);
         for(iLoop = 0; iLoop < jsRoot.getArraySize(jsProcs); iLoop++) {
             JsonFactory jsProc  = jsRoot.getObjAt(jsProcs, iLoop);
             procVer.parseFromJsonFactory(jsProc);
-            log << "Config: Parsing cur versions " << procVer.getVerString() << std::endl;
+            info_log << "Config: Parsing cur versions, " << procVer.getVerInfo() << std::endl;
             curVersions.push_back(procVer);
         }
     } catch(JsonException &jed) {
         std::cout << jed.what() << std::endl;
     }
-    log << "Config: Parsed current versions" << std::endl;
+    info_log << "Config: Parsed current versions" << std::endl;
+
+
     return true;
 }
 
-Version Config:: getVerForProc(std::string strProcName) {
-    Version temp;
+int Config:: getVerForProc(std::string strProcName) {
+    int temp = 0;
     for(Version ver : curVersions) {
         if (0 == ver.getProcName().compare(strProcName)) {
-            temp = ver;
+            temp = ver.getVer();
             break;
         }
     }
@@ -166,71 +164,40 @@ Version Config:: getVerForProc(std::string strProcName) {
 std::string XmppDetails::toString() {
 	std::stringstream ss;
 	ss << "\n\tclient_jid: " << client_jid
-		<< "\n\tclient_password: " << client_pwd
+		<< "\n\tclient_password: " << " password"
 		<< "\n\tcpanel_jid: " << cpanel_jid;
 	return ss.str();
 }
 
-Version::Version() : mjr {0}, mnr {0}, patch {0} { }
+Version::Version() : ver {0} { }
 Version::~Version() {}
 
-std::string Version::getVerString() {
-	std::stringstream ssver;
-	ssver << procName << " v" << mjr << "." << mnr << "." << patch;
-	return ssver.str();
+std::string Version::getVerInfo() {
+	std::stringstream ss;
+	ss << procName << ", Version: " << ver;
+	return ss.str();
 }
 
-bool Version::operator < (const Version &other) {
-    if(mjr < other.mjr || mnr < other.mnr || patch < other.patch) {
-            return true;
-    }
-    return false;
-}
-
-bool Version::operator > (const Version &other) {
-    if(mjr > other.mjr || mnr > other.mnr || patch > other.patch) {
-            return true;
-    }
-    return false;
-}
-
-bool Version::operator == (const Version &other) {
-    if(mjr == other.mjr && mnr == other.mnr && patch == other.patch) {
-            return true;
-    }
-    return false;
-}
-
-/*  { "name" : "process_name", "version": {"major":1,"minor":0,"patch":0} } */
+/*  { "name" : "process_name", "version": 1 } */
 void Version::parseFromJsonFactory(JsonFactory jsRoot) {
-    json_t *jsVer;
     try {
-            jsRoot.validateJSONAndGetValue("name", procName);
-            jsRoot.validateJSONAndGetValue("version", jsVer);
-            jsRoot.validateJSONAndGetValue("major", mjr, jsVer);
-            jsRoot.validateJSONAndGetValue("minor", mnr, jsVer);
-            jsRoot.validateJSONAndGetValue("patch", patch, jsVer);
+            jsRoot.validateJSONAndGetValue("process_name", procName);
+            jsRoot.validateJSONAndGetValue("version", ver);
     } catch(JsonException &jed) {
-            mjr = mnr = patch = 0;
             std::cout << jed.what() << std::endl;
     }
 }
 
-/*  { "name" : "process_name", "version": {"major":1,"minor":0,"patch":0} } */
+/*  { "name" : "process_name", "version": 1 } */
 void Version::parseFromString(std::string strJson) {
     JsonFactory jsRoot;
-    json_t *jsVer;
 
     if(!strJson.empty()) {
         try {
                 jsRoot.setJsonString(strJson);
-                jsRoot.validateJSONAndGetValue("name", procName);
-                jsRoot.validateJSONAndGetValue("version", jsVer);
-                jsRoot.validateJSONAndGetValue("major", mjr, jsVer);
-                jsRoot.validateJSONAndGetValue("minor", mnr, jsVer);
-                jsRoot.validateJSONAndGetValue("patch", patch, jsVer);
+                jsRoot.validateJSONAndGetValue("process_name", procName);
+                jsRoot.validateJSONAndGetValue("version", ver);
         } catch(JsonException &jed) {
-                mjr = mnr = patch = 0;
                 std::cout << jed.what() << std::endl;
         }
     }

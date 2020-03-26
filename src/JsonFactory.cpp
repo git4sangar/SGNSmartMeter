@@ -27,6 +27,12 @@ JsonFactory::JsonFactory(const JsonFactory &je) {
     json_incref(pJRoot);
 }
 
+JsonFactory &JsonFactory::operator=(JsonFactory &other) {
+    pJRoot = other.pJRoot;
+    json_incref(pJRoot);
+    return *this;
+}
+
 void JsonFactory::clear() {
     if(pJRoot) json_decref(pJRoot);
 }
@@ -35,7 +41,7 @@ JsonFactory::~JsonFactory() {
     clear();
 }
 
-string JsonFactory::getJsonString() throw(JsonException) {
+string JsonFactory::getJsonString() {
     string strJPkt;
     if(NULL == pJRoot) {
         throw JsonException("No content");
@@ -60,7 +66,7 @@ int JsonFactory::getArraySize(json_t *jsArrayObj) {
     return 0;
 }
 
-JsonFactory JsonFactory::getObjAt(json_t* jsArrayObj, int iIndex) throw (JsonException) {
+JsonFactory JsonFactory::getObjAt(json_t* jsArrayObj, int iIndex) {
     JsonFactory jsRoot;
     json_t *pTemp = NULL;
 
@@ -73,7 +79,7 @@ JsonFactory JsonFactory::getObjAt(json_t* jsArrayObj, int iIndex) throw (JsonExc
     return jsRoot;
 }
 
-void JsonFactory::setJsonString(string jsonStr) throw(JsonException) {
+void JsonFactory::setJsonString(string jsonStr) {
     json_error_t error = {0};
     json_t *pTemp = NULL;
 
@@ -127,6 +133,14 @@ void JsonFactory::addBoolValue(string strKey, bool bVal) {
 	}
 }
 
+void JsonFactory::appendToArray(JsonFactory jsObj) {
+    if(NULL == jsObj.pJRoot) return;
+    if(NULL == pJRoot) {
+        pJRoot = json_array();
+    }
+    json_array_append(pJRoot, jsObj.pJRoot);
+}
+
 unsigned char JsonFactory::isKeyAvailable(string strKey) {
     json_t *pJsonObj= NULL;
     if(NULL == pJRoot) {
@@ -136,7 +150,7 @@ unsigned char JsonFactory::isKeyAvailable(string strKey) {
     return (NULL != pJsonObj);
 }
 
-void JsonFactory::validateJSONAndGetValue(string key, string &val, json_t *pJObj) throw(JsonException) {
+void JsonFactory::validateJSONAndGetValue(string key, string &val, json_t *pJObj) {
     json_t *pJsonObj= NULL;
     json_t *pMyRoot = pJRoot;
 
@@ -161,7 +175,7 @@ void JsonFactory::validateJSONAndGetValue(string key, string &val, json_t *pJObj
     val = json_string_value(pJsonObj);
 }
 
-void JsonFactory::validateJSONAndGetValue(string key, int &val, json_t *pJObj) throw(JsonException) {
+void JsonFactory::validateJSONAndGetValue(string key, int &val, json_t *pJObj) {
     json_t *pJsonObj= NULL;
     json_t *pMyRoot = pJRoot;
     if(NULL != pJObj) {
@@ -185,7 +199,7 @@ void JsonFactory::validateJSONAndGetValue(string key, int &val, json_t *pJObj) t
     val = json_integer_value(pJsonObj);
 }
 
-void JsonFactory::validateJSONAndGetValue(string key, json_t* &val, json_t *pJObj) throw(JsonException) {
+void JsonFactory::validateJSONAndGetValue(string key, json_t* &val, json_t *pJObj) {
     json_t *pJsonObj= NULL;
     json_t *pMyRoot = pJRoot;
     if(NULL != pJObj) {
