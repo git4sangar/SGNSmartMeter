@@ -117,7 +117,7 @@ int main (int argc, char *argv[])
 	unsigned char *iv	= (unsigned char *)"0123456789012345";
 
 	if(argc != 2) {
-		printf("Usage: enc plain_text.json\n");
+		printf("Usage: enc cipher_file\n");
 		return 0;
 	}
 
