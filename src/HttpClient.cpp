@@ -45,7 +45,7 @@ HttpReqPkt *HttpClient::genericUpdate(std::string strUrl, std::string strFolder,
 	HttpReqPkt *pRqPkt	= new HttpReqPkt();
 	pRqPkt->setReqType(HTTP_REQ_TYPE_DWLD);
 	pRqPkt->setUrl(strUrl);
-	pRqPkt->setTgtFile(std::string(TECHNO_SPURS_APP_FOLDER));
+	pRqPkt->setTgtFile(strFolder);
 	pRqPkt->setCmdNo(cmdNo);
 	pRqPkt->setCmd(strCmd);
 	pRqPkt->addHeader(std::string("Content-Type: application/zip"));
@@ -152,11 +152,6 @@ void *HttpClient :: run(void *pHttpClient) {
 
         CURL *curl      = curl_easy_init();
         if(curl && pThis->pListener) {
-			/*curl_easy_setopt(curl, CURLOPT_PROXY, "http://proxyvipfmcc.nb.ford.com");
-			curl_easy_setopt(curl, CURLOPT_PROXY, "https://proxyvipfmcc.nb.ford.com");
-			curl_easy_setopt(curl, CURLOPT_PROXY, "ftp://proxyvipfmcc.nb.ford.com");
-			curl_easy_setopt(curl, CURLOPT_PROXYPORT, 83);*/
-
             curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 0L);
             curl_easy_setopt(curl, CURLOPT_URL, pReqPkt->getUrl().c_str());
 
@@ -246,4 +241,9 @@ size_t HttpClient :: write_function(char *ptr, size_t size, size_t nmemb, void *
     }
     return ret;
 }
+
+/*curl_easy_setopt(curl, CURLOPT_PROXY, "http://proxyvipfmcc.nb.ford.com");
+curl_easy_setopt(curl, CURLOPT_PROXY, "https://proxyvipfmcc.nb.ford.com");
+curl_easy_setopt(curl, CURLOPT_PROXY, "ftp://proxyvipfmcc.nb.ford.com");
+curl_easy_setopt(curl, CURLOPT_PROXYPORT, 83);*/
 

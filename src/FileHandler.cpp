@@ -219,8 +219,8 @@ void *FileHandler :: run(void *pUserData) {
 				pJabberClient->sendMsgTo(strResp, cPanelJid);
 
 				//	Now delete the versions file & let it be created by watch dog
-				std::string strVerFile	= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_VERSIONS);
-				unlink(strVerFile.c_str());
+				//std::string strVerFile	= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_VERSIONS);
+				//unlink(strVerFile.c_str());
 
 				//	Now send a reboot request to Watchdog. Just frame the JSON pkt, using JsonFactory is an overkill here
 				Utils::sendPacket(WDOG_Tx_PORT, "{\"command\":\"reboot\"}");
