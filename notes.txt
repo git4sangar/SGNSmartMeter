@@ -1,5 +1,8 @@
 sgn
 
+28-Mar-2020
+Release Version 01
+
 Provisioning a new RPi
 (01) Install the Raspbian Buster Lite on SD Card
 
