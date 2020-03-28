@@ -50,7 +50,8 @@
 #define TECHNO_SPURS_DOWNLOAD_PATH	"downloads/"
 #define TECHNO_SPURS_TEMP_DWLD_PATH	"downloads/SmartMeter"
 #define TECHNO_SPURS_APP_FOLDER		"SmartMeter"
-#define TECHNO_SPURS_LOG_FILE		"logs/jabber_logs_"
+#define TECHNO_SPURS_JABBER_LOG		"logs/jabber_logs_"
+#define TECHNO_SPURS_WDOG_LOG		"logs/wdog_logs_"
 #define TECHNO_SPURS_CLIENT_FOLDER	"JabberClient"
 #define TECHNO_SPURS_CLIENT_FILE	"JabberClient/JabberClient"
 

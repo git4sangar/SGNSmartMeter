@@ -218,11 +218,11 @@ void *FileHandler :: run(void *pUserData) {
 				strResp	= pThis->makeRespPkt(cmdNo, strUnqId, true, "");
 				pJabberClient->sendMsgTo(strResp, cPanelJid);
 
-				//	Now delete the versions file & let it be created by watch dog
-				//std::string strVerFile	= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_VERSIONS);
-				//unlink(strVerFile.c_str());
+				Utils::sendPacket(WDOG_Tx_PORT, "{\"command\":\"upload_logs\"}");
+				info_log << "FileHandler: Going to reboot in 30 secs..." << std::endl;
+				info_log.uploadLogs();
+				sleep(30);	// Let us wait for a min & reboot
 
-				//	Now send a reboot request to Watchdog. Just frame the JSON pkt, using JsonFactory is an overkill here
 				Utils::sendPacket(WDOG_Tx_PORT, "{\"command\":\"reboot\"}");
 			}
 		} else {

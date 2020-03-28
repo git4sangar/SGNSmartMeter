@@ -170,7 +170,9 @@ void MessageHandler::sendHeartBeat() {
 
 void MessageHandler:: uploadLogs() {
     info_log << "Message Handler: Uploading Logs" << std::endl;
-    info_log.uploadLog();
+    info_log.uploadLogs();
+    // Upload watchdog logs too
+    Utils::sendPacket(WDOG_Tx_PORT, "{\"command\":\"upload_logs\"}");
 }
 
 void MessageHandler:: getVerReq() {
@@ -179,7 +181,9 @@ void MessageHandler:: getVerReq() {
 }
 
 void MessageHandler:: reboot() {
-    info_log << "Message Handler: Rebooting system" << std::endl;
+    uploadLogs();
+    info_log << "Message Handler: Going to reboot in 30 secs..." << std::endl;
+    sleep(30);
     Utils::sendPacket(WDOG_Tx_PORT, "{\"command\":\"reboot\"}");
 }
 
@@ -270,7 +274,7 @@ void *MessageHandler::run(void *pUserData) {
                     pThis->uploadLogs();
                     break;
 
-                case GET_VERSION_INFO:
+                case VERSION_REQUEST:
                     pThis->getVerReq();
                     break;
 
@@ -322,11 +326,12 @@ void *wdogRespThread(void *pUserData) {
     struct sockaddr_in clientaddr;
     int clientlen, recvd;
     char buf[MAX_BUFF_SIZE];
-    std::string strCmd;
+    std::string strCmd, strData;
 
-    JabberClient *pChatClient	= JabberClient::getJabberClient();
+    JabberClient *pJabberClient	= JabberClient::getJabberClient();
     Config *pConfig	= Config::getInstance();
     Logger &log = Logger::getInstance();
+    MessageStructure msgStruct;
 
     int sockfd	= Utils::prepareRecvSock(WDOG_Rx_PORT);
     while(true) {
@@ -337,14 +342,21 @@ void *wdogRespThread(void *pUserData) {
 		try {
 			jsRoot.setJsonString(std::string(buf));
 			jsRoot.validateJSONAndGetValue("command", strCmd);
-		} catch(JsonException &je) { log << "Json Exception" << std::endl;}
 
-		//	Process command
-		if(!strCmd.compare("version_req")) {
-			pConfig->parseCurVersions(std::string(buf));
-			//	Send CPanel the version info
-			pChatClient->sendMsgTo(pConfig->getCurVersions(), pConfig->getXmppDetails().getCPanelJid());
-		}
+			//	Process command
+			int iCmd    = msgStruct.getCommandVal(strCmd);
+			switch(iCmd) {
+			case VERSION_REQUEST:
+				pConfig->parseCurVersions(std::string(buf));
+				pJabberClient->sendMsgTo(pConfig->getCurVersions(), pConfig->getXmppDetails().getCPanelJid());
+				break;
+
+			case UPLOAD_LOGS:
+				jsRoot.validateJSONAndGetValue("log_data", strData);
+				HttpClient::getInstance()->uploadLogs(0, TECHNO_SPURS_WDOG_LOG, strData);
+				break;
+			}
+		} catch(JsonException &je) { log << "Json Exception" << std::endl;}
     }
 	return NULL;
 }

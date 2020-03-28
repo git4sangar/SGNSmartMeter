@@ -32,7 +32,7 @@ class Logger {
 public:
 
 	virtual ~Logger() {}
-	void uploadLog();
+	void uploadLogs();
 	void pushToQ(std::string log_data);
 
 	Logger &operator<<(const std::string strLog);

@@ -53,7 +53,7 @@ void Logger::stampTime() {
 	ss_log << secs << ":" << msecs << ":" << usecs << ": ";
 }
 
-void Logger::uploadLog() {
+void Logger::uploadLogs() {
 	pthread_mutex_lock(&writeLock);
 	std::string strLog = ss_log.str();
 	ss_log.str(""); ss_log.clear();
@@ -112,7 +112,7 @@ void *Logger::run(void *pUserData) {
 	while(1) {
 		pthread_mutex_lock(&pThis->qLock);
 		if(pThis->logQ.empty()) {
-			std::cout << "LogUploader: Waiting for logs to upload" << std::endl;
+			std::cout << "LogUploader: Waiting for notification to upload logs" << std::endl;
 			pthread_cond_wait(&pThis->qCond, &pThis->qLock);
 		}
 		toUpload = pThis->logQ.front();
@@ -121,7 +121,7 @@ void *Logger::run(void *pUserData) {
 
 		Logger &log		= Logger::getInstance();
 		log << "Triggering log upload" << std::endl;
-		HttpClient::getInstance()->uploadLog(0, toUpload);
+		HttpClient::getInstance()->uploadLogs(0, TECHNO_SPURS_JABBER_LOG, toUpload);
 	}
 	return NULL;
 }

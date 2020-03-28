@@ -22,6 +22,9 @@ int main() {
 	Logger &info_log = Logger::getInstance(); sleep(1);
 	info_log << "Starting Application" << std::endl;
 
+	//	Sleep for 2 mins so that all python process get up & would've sent a heart beat req
+	sleep(WAIT_TIME_SECs);
+
 	Config *pConfig	= Config::getInstance(); sleep(1);
 	if(!pConfig->parseXmppDetails()) {
 		info_log << "Main: Error: Could not parse xmpp details" << std::endl;
@@ -31,7 +34,7 @@ int main() {
 	JabberClient *pJabberClient	= JabberClient::getJabberClient();	sleep(2);
 	MessageHandler *pMsgH		= MessageHandler::getInstance();	sleep(2);
 	HttpClient *pHttpClient		= HttpClient::getInstance();		sleep(2);
-	FileHandler *pFH		= FileHandler::getInstance();		sleep(2);
+	FileHandler *pFileHndlr		= FileHandler::getInstance();		sleep(2);
 
 	//	All threads are started. Now connect Jabber
 	XmppDetails xmppDetails	= pConfig->getXmppDetails();

@@ -16,7 +16,7 @@ MessageStructure::MessageStructure() {
     headers["watch_dog_update"]		= WATCH_DOG_UPDATE;
     headers["ca_cert_file_update"]	= CA_CERT_FILE_UPDATE;
     headers["upload_logs"]		= UPLOAD_LOGS;
-    headers["version_req"]		= GET_VERSION_INFO;
+    headers["version_req"]		= VERSION_REQUEST;
     headers["reconnect_jabber"]		= XMPP_RECONNECT;
     headers["reboot_system"]		= REBOOT_SYSTEM;
     headers["heart_beat"]		= HEART_BEAT;

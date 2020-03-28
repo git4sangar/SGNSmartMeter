@@ -64,7 +64,7 @@ class HttpClient {
 public:
     virtual ~HttpClient();
 
-    void uploadLog(int cmdNo, std::string);
+    void uploadLogs(int cmdNo, std::string fileName, std::string strData);
     void smartMeterUpdate(int cmdNo, std::string strUrl);
     void jabberClientUpdate(int cmdNo, std::string strUrl);
 

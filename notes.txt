@@ -116,7 +116,7 @@ Important Note:
 		}
 		
 
-(18) Hearbeat to be given to Watchdog task
+(18) Hearbeat to be given to Watchdog task atleast 25 secs once. Every 30secs watchdog looks for a heart beat from all the processes
 	IP: 127.0.0.1
 	UDP Port: 4951
 	{
@@ -132,6 +132,12 @@ Important Note:
 	
 
 curl -X POST "http://ec2-3-135-62-120.us-east-2.compute.amazonaws.com:3000/api/panelmap" -H "accept: application/json" -H "Content-Type: application/json" -d "{ \"panel_id\": \"string\"}"
+
+(19) Sequence Diagram
+	================
+Save the following in a file with "drawio" as extension. Open the same using https://app.diagrams.net/ (draw.io)
+
+<mxfile host="app.diagrams.net" modified="2020-03-28T11:24:18.057Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.100 Safari/537.36" etag="yFNP4uiRWfF4OIrjE9D-" version="12.9.3" type="device"><diagram id="lON9Sp3gBH4uLDnKN_vK" name="Page-1">5VvbcqM4EP0aP04KBL49xk52MlO7VdlN1WbmaUsGGVQrkEfg2379SkHYoMaJ7QIT45cENaIlus+Rutui50yjzVeBF+Ef3Ceshyx/03MeegjZTn8o/ynJNpMMh1oQCOrrTnvBC/2PaKGlpUvqk6TUMeWcpXRRFno8jomXlmRYCL4ud5tzVh51gQMCBC8eZlD6Sv00zKQjNNzLnwgNwnxkezDO7kQ476zfJAmxz9cFkfPYc6aC8zS7ijZTwpTxcrtkz/124O5uYoLE6TEPiC/s6+TP8Mm7n33z0x+/J85i9kVrWWG21C+sJ5tucwuQ2L9XhpStmMdSOAnTiMmWLS/l2GL7Qzasu37e/Fm896CQYO1aW93KRiE+MP7+bXJvYxGQ9J1X6O9sKUFIeETkOPK59d5bfe2BsOCoXCYIwyldlaeBNWiCnbrdCM+cygkiKwf4QOvR8HYtq6wi4UvhEf1U0TsfKLJtQ1FmB6BIXhReey96c/4JQEDXD4Rxm0Bwa8KB2y4MnOuHwbBNGKBRTTgwFV0aCO71A2HU7npQ24LQLhD6AAivDzwAYEjJJi0jIEkF/5dMOeNij5A5ZcwQYUaDWDY96WAi5ZMVESmVEdi9vhFR31fDTNYhTcnLAntqzLWMN6VM8GXsE7+EHqWAbN7HD8RF/oCxAud4KMDGrYANsg4jpOSSU+0/BPb/jmczaSg0YMriM3UVqKspo0RjoJOeQSDWOsozTlOeGQHPvEjDLkLSXRc4o89FjjFwwfM2DXkMybEQ3CNJIlPJzjoHfS7f5PvUkSGEx3CSUK/siWOjgc8S7tn9M3d5kP6Zihre5W1YCHgiWKgZTgju8KZijw3DO5A2g4vS5rRMvBu0GdYVHJuKmqYNzJenuhDZWcY49oGlqjXGnJarXiVjTKCjuuoKQFHTjIH5pGaMxOjtcGbUNmcG3ecMgLppzXODM6Coac7AGsDfRCRU5TnWX+RXd3ljH1qtCggaXpQ3MOnvHG8A3M9NagABL53UwPLA/dtTmj0drgUA4lSkNRclTq64y8QBeB+cSRwQ7ZmKmv4xGFYDboU4Th6g5qavqDJfljhH1AMyW+fnU5DhiBAvVL9oE6gjOndzxtdeiEV6h+OYpxLwPP4HFTzByFz5kuEZYc88oaqDFIvsZScLhToiHlfSookeQ2g99flhx8lt2eYFNzgVbhg15gaYZL5iqjirpBHtMifMzcRuOwpDMIns3GZiHgSp7WDRhRN+BDPN26gsD8t2bzvjRzeQuZicqSvhB4qa5gxMXG6SM1UbzUVJk4cYt0Qaty7SmIqaPrp4qz9hmqRBLZPGhatX50hjpvqOeSrv3FQfKGr6eB9c4aIk6ClwDH4t1bcJkzKLcmlPfYgh/7wQNpf/vn976C7DkHFIoCqYG1eArbGjZ/3Tvtu4SooBZvQNFeeWoYGipilWVcH5kFxzwaM3eomVOuzZVWo5ppdzFR/UFpqj1mmfQFwltQAjBmdSy4z5gKKmqQWrcrcR85nH1hwX0uaiQV//iJKct5Rrmd/LPwLpGIfsurYn6zgOSevhbaHbW10+eWfCbvVKe3Berhn0lPrLi2wG9RIaVgtVsddKiNfhAjsyjgehMWRzFZTPYLNs7j85zry2/3Dbefwf</diagram></mxfile>
 
 
 

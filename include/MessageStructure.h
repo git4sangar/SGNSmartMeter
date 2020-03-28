@@ -17,7 +17,7 @@
 #define WATCH_DOG_UPDATE	(3)
 #define CA_CERT_FILE_UPDATE	(4)
 #define UPLOAD_LOGS         	(5)
-#define GET_VERSION_INFO    	(6)
+#define VERSION_REQUEST    	(6)
 #define REBOOT_SYSTEM       	(7)
 #define	BLANK_CMD		(9)
 #define XMPP_RECONNECT		(10)

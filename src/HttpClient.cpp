@@ -72,8 +72,8 @@ void HttpClient::jabberClientUpdate(int cmdNo, std::string strUrl) {
 	pushToQ(pRqPkt);
 }
 
-void HttpClient::uploadLog(int cmdNo, std::string strLog) {
-	if(strLog.empty() || 0 > cmdNo) {
+void HttpClient::uploadLogs(int cmdNo, std::string fileName, std::string strLogData) {
+	if(strLogData.empty() || 0 > cmdNo) {
 		info_log << "HttpClient: Log content empty" << std::endl;
 		return;
 	}
@@ -81,8 +81,7 @@ void HttpClient::uploadLog(int cmdNo, std::string strLog) {
 	HttpReqPkt *pRqPkt	= new HttpReqPkt();
 	pRqPkt->setReqType(HTTP_REQ_TYPE_UPLD);
 	pRqPkt->setUrl(LOG_UPLOAD_URL);
-	std::string strFile	= std::string(TECHNO_SPURS_ROOT_PATH) +
-							std::string(TECHNO_SPURS_LOG_FILE) +
+	std::string strFile	= std::string(TECHNO_SPURS_ROOT_PATH) + fileName +
 							Utils::getYYYYMMDD_HHMMSS();
 	pRqPkt->setTgtFile(strFile);
 	pRqPkt->setCmdNo(cmdNo);
@@ -94,7 +93,7 @@ void HttpClient::uploadLog(int cmdNo, std::string strLog) {
 	pRqPkt->addHeader(std::string("module:") + std::string(MODULE_NAME));
 	pRqPkt->addHeader(std::string("panel:") + strUniqID);
 
-	pRqPkt->setUserData(strLog);
+	pRqPkt->setUserData(strLogData);
 
 	info_log << "HttpClient: Making log upload request" << std::endl;
 	pushToQ(pRqPkt);
@@ -246,4 +245,3 @@ size_t HttpClient :: write_function(char *ptr, size_t size, size_t nmemb, void *
 curl_easy_setopt(curl, CURLOPT_PROXY, "https://proxyvipfmcc.nb.ford.com");
 curl_easy_setopt(curl, CURLOPT_PROXY, "ftp://proxyvipfmcc.nb.ford.com");
 curl_easy_setopt(curl, CURLOPT_PROXYPORT, 83);*/
-
