@@ -136,7 +136,18 @@ Important Note:
 
 curl -X POST "http://ec2-3-135-62-120.us-east-2.compute.amazonaws.com:3000/api/panelmap" -H "accept: application/json" -H "Content-Type: application/json" -d "{ \"panel_id\": \"string\"}"
 
-(19) Sequence Diagram
+(19) Enter the following at the end of file /path/to/sdcard/etc/wpa_supplicant/wpa_supplicant.conf
+network={
+	ssid="technospurs"
+	proto=RSN
+	key_mgmt=WPA-PSK
+	psk="Welcome123$"
+}
+
+Note: The android phone used for setting the WiFi details shall have the "Hotspot name" as technospurs and "Hotsport password" as Welcome123$
+	This makes sure, the raspberry pi device gets connected to the android phone's hotspot when powered on
+
+(20) Sequence Diagram
 	================
 Save the following in a file with "drawio" as extension. Open the same using https://app.diagrams.net/ (draw.io)
 

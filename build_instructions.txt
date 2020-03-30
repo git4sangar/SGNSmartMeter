@@ -3,7 +3,7 @@ sgn
 Building JabberClient
 g++ ./src/Constants.cpp ./src/FileHandler.cpp ./src/FileLogger.cpp ./src/HttpClient.cpp ./src/JabberClient.cpp ./src/JsonFactory.cpp ./src/MainApp.cpp ./src/MessageHandler.cpp ./src/MessageStructure.cpp ./src/Utils.cpp -I./include -lpthread -lstrophe -ljansson -larchive -lcurl -lcrypto -lssl -o JabberClient -std=c++11
 
-g++ ./src/JsonFactory.cpp ./src/MainApp.cpp ./src/WatchDog.cpp ./src/FileLogger.cpp ./src/Utils.cpp -I./include -ljansson -lpthread -o WatchDog
+g++ ./src/JsonFactory.cpp ./src/MainApp.cpp ./src/WatchDog.cpp ./src/FileLogger.cpp ./src/Utils.cpp -I./include -ljansson -lpthread -o WatchDog -std=c++11
 
 
 make depend && make _build_libs
