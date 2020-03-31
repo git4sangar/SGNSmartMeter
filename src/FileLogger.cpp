@@ -24,6 +24,8 @@ Logger &Logger:: getInstance() {
 }
 
 Logger::Logger() : bTime (true), writeLock(PTHREAD_MUTEX_INITIALIZER) {
+    qLock   = PTHREAD_MUTEX_INITIALIZER;
+    qCond   = PTHREAD_COND_INITIALIZER;
 	pthread_t logger_thread;
 	pthread_create(&logger_thread, NULL, &run, this);
 	pthread_detach(logger_thread);

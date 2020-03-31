@@ -334,6 +334,7 @@ void *wdogRespThread(void *pUserData) {
     MessageStructure msgStruct;
 
     int sockfd	= Utils::prepareRecvSock(WDOG_Rx_PORT);
+    clientlen   = sizeof(struct sockaddr_in);
     while(true) {
 		JsonFactory jsRoot;
 		recvd       = recvfrom(sockfd, buf, MAX_BUFF_SIZE, 0, (struct sockaddr *) &clientaddr, (socklen_t*)&clientlen);

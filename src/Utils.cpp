@@ -20,6 +20,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <sys/socket.h>
+#include <unistd.h>
 #include <errno.h>
 #include <netdb.h>
 #include <arpa/inet.h>
@@ -27,7 +28,7 @@
 #include <ifaddrs.h>
 
 pthread_mutex_t Utils::mtxRunningNo = PTHREAD_MUTEX_INITIALIZER;
-int Utils::iRunningNo = 1001;
+int Utils::iRunningNo	= 1001;
 
 int Utils::getUniqueRunningNo() {
     int iRet = 0;
@@ -166,7 +167,6 @@ int Utils::aesDecrypt(unsigned char *ciphertext, int ciphertext_len, unsigned ch
     return plaintext_len;
 }
 
-
 std::string Utils::getHostToIp(std::string strHost) {
     std::string strIp, serv1 = "https://", serv2 = "http://", serv = "http";
     struct addrinfo hints, *servinfo = NULL, *p = NULL;
@@ -204,7 +204,7 @@ std::string Utils::getHostToIp(std::string strHost) {
     return strIp;
 }
 
-in_addr_t Utils::getIpv4IpOfEthIF() {
+in_addr_t Utils::getIpv4IpOfEthIF(char *if_name) {
     struct ifaddrs *ifAddrs = NULL, *ifIter = NULL;
     std::string ifName;
     in_addr_t myip = 0;
@@ -214,8 +214,8 @@ in_addr_t Utils::getIpv4IpOfEthIF() {
 
     for(ifIter  = ifAddrs; NULL != ifIter; ifIter = ifIter->ifa_next) {
         ifName  = ifIter->ifa_name;
-        //  skip interfaces other than ipv4 and eth
-        if(ifIter->ifa_addr->sa_family == AF_INET && std::string::npos != ifName.find("eth")) {
+        //  skip interfaces other than ipv4 and if_name
+        if(ifIter->ifa_addr->sa_family == AF_INET && std::string::npos != ifName.find(if_name)) {
             myip    = ((struct sockaddr_in *)ifIter->ifa_addr)->sin_addr.s_addr;
             break;
         }
@@ -285,6 +285,7 @@ void Utils::sendPacket(int port, std::string strPacket) {
 	bzero(&(their_addr.sin_zero), 8);
 	sendto(sockfd, strPacket.c_str(), strPacket.length(), 0,
 			 (struct sockaddr *)&their_addr, sizeof(struct sockaddr));
+	close(sockfd);
 }
 
 int Utils::sendUDPPacket(in_addr_t toIp, int iPort, std::string strPayload, unsigned char isBroadCast) {
@@ -307,6 +308,7 @@ int Utils::sendUDPPacket(in_addr_t toIp, int iPort, std::string strPayload, unsi
     ipAddr.sin_addr.s_addr  = toIp;
 
     int iRet = sendto(iSock, strPayload.c_str(), strPayload.length()+1, 0, (struct sockaddr *)&ipAddr, iLen);
+    close(iSock);
     return iRet;
 }
 
