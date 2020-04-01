@@ -14,7 +14,7 @@
 #include "FileLogger.h"
 #include "Constants.h"
 
-JabberClient::JabberClient() : log(Logger::getInstance()) {
+JabberClient::JabberClient() : info_log(Logger::getInstance()) {
     ctx     = NULL;
     conn    = NULL;
     xmpp_log= NULL;
@@ -42,8 +42,10 @@ int JabberClient::connect(std::string strServer, std::string strFullJid, std::st
     conn    = xmpp_conn_new(ctx);
 
     xmpp_conn_set_keepalive(conn, KA_TIMEOUT, KA_INTERVAL);
-    log    << "JabberClient: Connecting xmpp server with username "
+    info_log    << "JabberClient: Connecting xmpp server with username "
                 << strFullJid << ", password " << "password" << std::endl;
+
+    xmpp_conn_set_flags(conn, XMPP_CONN_FLAG_TRUST_TLS);
 
     xmpp_conn_set_jid(conn, strFullJid.c_str());
     xmpp_conn_set_pass(conn, strPswd.c_str());
@@ -59,18 +61,20 @@ void JabberClient::conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_
 
     if (status == XMPP_CONN_CONNECT) {
         xmpp_stanza_t* pres;
-        pJabberClient->log << "JabberClient: Connected" << std::endl;
+        pJabberClient->info_log << "JabberClient: Connected" << std::endl;
         xmpp_handler_add(conn, JabberClient::version_handler, "jabber:iq:version", "iq", NULL, ctx);
         xmpp_handler_add(conn, JabberClient::message_handler, NULL, "message", NULL, pJabberClient);
 
         /* Send initial <presence/> so that we appear online to contacts */
         pres = xmpp_presence_new(ctx);
+        xmpp_stanza_set_name(pres, "presence");
         xmpp_send(conn, pres);
         xmpp_stanza_release(pres);
         if(pJabberClient->pXmppListener) pJabberClient->pXmppListener->onXmppConnect();
     }
     else {
-    	pJabberClient->log << "JabberClient: Error: Connect to server failed" << std::endl;
+    	pJabberClient->info_log << "JabberClient: Error: Connect to server failed: "
+    			<< error  << std::endl;
     	if(pJabberClient->pXmppListener) pJabberClient->pXmppListener->onXmppDisconnect(status);
     }
 }
@@ -140,7 +144,7 @@ int JabberClient::message_handler(xmpp_conn_t * const conn, xmpp_stanza_t * cons
     intext      = xmpp_stanza_get_text(body);
     const char *pFrom = xmpp_stanza_get_attribute(stanza, "from");
 
-    pJabberClient->log << "JabberClient: Got packet " << intext << ", from " << pFrom << std::endl;
+    pJabberClient->info_log << "JabberClient: Got packet " << intext << ", from " << pFrom << std::endl;
     if(pJabberClient->pXmppListener) {
             std::string strFrom = (pFrom) ? pFrom : "";
             pJabberClient->pXmppListener->onXmppMessage(std::string(intext), std::string(strFrom));
@@ -155,12 +159,23 @@ void JabberClient::xmppShutDown() {
 	xmpp_shutdown();
 }
 
+void JabberClient::sendPresence(std::string toAddress) {
+	info_log << "JabberClient: Sending presence" << std::endl;
+	xmpp_stanza_t *pres = xmpp_presence_new(ctx);
+	xmpp_stanza_set_name(pres, "presence");
+	xmpp_stanza_set_type(pres, "subscribed");
+	xmpp_stanza_set_attribute(pres, "to", toAddress.c_str());
+
+	xmpp_send(conn, pres);
+	xmpp_stanza_release(pres);
+}
+
 int JabberClient::sendMsgTo(std::string strMsg, std::string toAddress) {
-	log << "JabberClient: Sending " << strMsg << " to " << toAddress << std::endl;
+	info_log << "JabberClient: Sending " << strMsg << " to " << toAddress << std::endl;
     xmpp_stanza_t *reply = NULL, *body = NULL, *text = NULL;
 
     if(toAddress.empty()) {
-    	log << "JabberClient: Error: Invalid to address" << std::endl;
+    	info_log << "JabberClient: Error: Invalid to address" << std::endl;
         return -1;
     }
 

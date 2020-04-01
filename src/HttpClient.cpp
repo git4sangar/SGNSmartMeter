@@ -67,8 +67,18 @@ void HttpClient::jabberClientUpdate(int cmdNo, std::string strUrl) {
 		info_log << "HttpClient: Jabber client update URL empty" << std::endl;
 		return;
 	}
-	HttpReqPkt *pRqPkt	= genericUpdate(strUrl, std::string(TECHNO_SPURS_CLIENT_FOLDER), "jabber_client_update", cmdNo);
+	HttpReqPkt *pRqPkt	= genericUpdate(strUrl, std::string(TECHNO_SPURS_JABBER_FOLDER), "jabber_client_update", cmdNo);
 	info_log << "HttpClient: Making Jabber client update request with CmdNo: " << cmdNo << std::endl;
+	pushToQ(pRqPkt);
+}
+
+void HttpClient::watchDogUpdate(int cmdNo, std::string strUrl) {
+	if(strUrl.empty() || 0 > cmdNo) {
+		info_log << "HttpClient: Watchdog update update URL empty" << std::endl;
+		return;
+	}
+	HttpReqPkt *pRqPkt	= genericUpdate(strUrl, std::string(TECHNO_SPURS_WDOG_FOLDER), "watchdog_update", cmdNo);
+	info_log << "HttpClient: Making Watchdog update request with CmdNo: " << cmdNo << std::endl;
 	pushToQ(pRqPkt);
 }
 

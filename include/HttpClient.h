@@ -67,6 +67,7 @@ public:
     void uploadLogs(int cmdNo, std::string fileName, std::string strData);
     void smartMeterUpdate(int cmdNo, std::string strUrl);
     void jabberClientUpdate(int cmdNo, std::string strUrl);
+    void watchDogUpdate(int cmdNo, std::string strUrl);
 
     void subscribeListener(HttpResponse *pObj) { pListener = pObj; }
     void pushToQ(HttpReqPkt *pReqPkt);

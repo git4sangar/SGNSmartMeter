@@ -60,6 +60,7 @@ void MessageHandler:: smartMeterUpdate(std::string strPkt) {
 
     //  Compare if current version is lesser than new
     for(Version newVer : newVersions) {
+    	if(!newVer.getProcName().compare(WDOG_PROC_NAME)) continue;
         int curVer  = pConfig->getVerForProc(newVer.getProcName());
         info_log << "MessageHandler: Cur Ver " << curVer << ", New Ver " << newVer.getVer() << std::endl;
         if(curVer < newVer.getVer()) {
@@ -113,6 +114,26 @@ void MessageHandler::jabberClientUpdate(std::string strPkt) {
 	}
 }
 
+void MessageHandler::watchDogUpdate(std::string strPkt) {
+	if(strPkt.empty()) return;
+
+	int cmdNo, ver;
+	std::string strUrl;
+	JsonFactory jsRoot;
+	try {
+		jsRoot.setJsonString(strPkt);
+		jsRoot.validateJSONAndGetValue("url", strUrl);
+		jsRoot.validateJSONAndGetValue("command_no", cmdNo);
+		jsRoot.validateJSONAndGetValue("version", ver);
+	} catch(JsonException &je) {}
+
+	Config *pConfig = Config::getInstance();
+	if(pConfig->getVerForProc(WDOG_PROC_NAME) < ver) {
+		HttpClient *pHttpClient = HttpClient::getInstance();
+		pHttpClient->watchDogUpdate(cmdNo, strUrl);
+	}
+}
+
 std::vector<Version> MessageHandler:: getNewVersions(std::string strNewVersions) {
     std::vector<Version> newVersions;
     Version ver;
@@ -152,7 +173,7 @@ void MessageHandler::reconnectJabber() {
 }
 
 void MessageHandler::sendHeartBeat() {
-	std::string strBinFile	= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_CLIENT_FILE);
+	std::string strBinFile	= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_JABBER_FILE);
 
 	if(strHeartBeat.empty()) {
 		JsonFactory jsRoot;
@@ -213,7 +234,7 @@ void MessageHandler::onXmppConnect() {
 }
 
 void MessageHandler::onXmppDisconnect(int iErr) {
-    info_log << "Xmpp disconnected \n" << std::endl;
+    info_log << "Xmpp disconnected with stauts " << iErr << std::endl;
     JsonFactory jsRoot;
     jsRoot.addStringValue("command", "reconnect_jabber");
     std::string strCmd	= jsRoot.getJsonString();
@@ -260,6 +281,10 @@ void *MessageHandler::run(void *pUserData) {
 
                 case JABBER_CLIENT_UPDATE:
                 	pThis->jabberClientUpdate(strMsg);
+                	break;
+
+                case WATCH_DOG_UPDATE:
+                	pThis->watchDogUpdate(strMsg);
                 	break;
 
                 case XMPP_RECONNECT:
@@ -317,6 +342,7 @@ void *heartBeat(void *pUserData) {
 	while(true) {
 		sleep(25);
 		log << "Main: Sending HeartBeat msg to self JID" << std::endl;
+		pJabberClient->sendPresence(pConfig->getXmppDetails().getCPanelJid());
 		pJabberClient->sendMsgTo(strCmd, pConfig->getXmppDetails().getClientJid());
 	}
 	return NULL;

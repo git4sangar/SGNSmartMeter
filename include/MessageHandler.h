@@ -36,6 +36,7 @@ public:
     void pushToQ(std::string msg);
     void smartMeterUpdate(std::string strPkt);
     void jabberClientUpdate(std::string strPkt);
+    void watchDogUpdate(std::string strPkt);
     void uploadLogs();
     void getVerReq();
     void reboot();

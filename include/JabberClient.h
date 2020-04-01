@@ -21,7 +21,7 @@
 class JabberClient {
     JabberClient();
     static JabberClient *pJabberClient;
-    Logger &log;
+    Logger &info_log;
 
     xmpp_ctx_t *ctx;
     xmpp_conn_t *conn;
@@ -36,6 +36,7 @@ public:
         void stopXmpp();
         void startXmpp() { if(NULL != ctx) xmpp_run(ctx);}
         int sendMsgTo(std::string strMsg, std::string toAddress);
+        void sendPresence(std::string toAddress);
         void xmppShutDown();
         xmpp_ctx_t *getConext() {return ctx;}
 

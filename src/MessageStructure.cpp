@@ -13,7 +13,7 @@ MessageStructure::MessageStructure() {
     headers["smart_meter_update"]	= SMART_METER_UPDATE;
     headers["python_package_update"]	= PYTHON_PACKAGE_UPDATE;
     headers["jabber_client_update"]	= JABBER_CLIENT_UPDATE;
-    headers["watch_dog_update"]		= WATCH_DOG_UPDATE;
+    headers["watchdog_update"]		= WATCH_DOG_UPDATE;
     headers["ca_cert_file_update"]	= CA_CERT_FILE_UPDATE;
     headers["upload_logs"]		= UPLOAD_LOGS;
     headers["version_req"]		= VERSION_REQUEST;

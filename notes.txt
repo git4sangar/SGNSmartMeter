@@ -17,21 +17,20 @@ Provisioning a new RPi
 (04) Copy the libraries required for XMPP Client & Watch dog server to /path/to/sdcard/usr/local/lib
 (05) Copy the packages required for python to appropriate /path/to/sdcard/home/pi/.local/lib/python3.5/site-packages
 (06) Create the following folders
-                (a) /path/to/sdcard/home/pi/technospurs/certs/
-                (b) /path/to/sdcard/home/pi/technospurs/cfg
-                (c) /path/to/sdcard/home/pi/technospurs/wdog
-                (d) /path/to/sdcard/home/pi/technospurs/downloads
-                (e) /path/to/sdcard/home/pi/technospurs/SmartMeter
-                (f) /path/to/sdcard/home/pi/technospurs/JabberClient
-                (g) /path/to/sdcard/home/pi/technospurs/logs
-				(h) /path/to/sdcard/home/pi/technospurs/
+                (a) /path/to/sdcard/home/pi/Technospurs/Certs
+                (b) /path/to/sdcard/home/pi/Technospurs/CFG
+                (c) /path/to/sdcard/home/pi/Technospurs/WDog
+                (d) /path/to/sdcard/home/pi/Technospurs/Downloads
+                (e) /path/to/sdcard/home/pi/Technospurs/SmartMeter
+                (f) /path/to/sdcard/home/pi/Technospurs/JabberClient
+                (g) /path/to/sdcard/home/pi/Technospurs/Logs
 Important Note:
 ---------------
 	-> The first line of the python script shall be as follows
 		#!/usr/bin/python3.7
 	-> The script shall have execute permission set. (ls -l shall yield "-rwxr-xr-x" for that python script)
 
-(07) copy the certificates to /path/to/sdcard/home/pi/technospurs/certs/cacert.pem => I will hardcode this. If required, we can replace this file through software update
+(07) copy the certificates to /path/to/sdcard/home/pi/technospurs/Certs/cacert.pem => I will hardcode this. If required, we can replace this file through software update
 (08) copy the python code to /path/to/sdcard/home/pi/technospurs/ (folder name is Smartmeter right?) -> make sure execute permission
 (09) copy the xmpp client & watch dog server code to /path/to/sdcard/home/pi/technospurs/JabberClient -> make sure execute permission
 (10) copy the dependencies (libxxx.so files) to /usr/local/lib
@@ -77,6 +76,15 @@ Important Note:
 			"url"			: "https://technospurs.com/imageSets.zip",
 			"version"		: 2
 		}
+
+	For WatchDog
+		{
+			"command"		: "watchdog_update",
+			"command_no"	: 12,
+			"url"			: "https://technospurs.com/imageSets.zip",
+			"version"		: 3
+		}
+
 	Additional Info
 	===============
 	on unzipping, it shall yield "SmartMeter" folder with necessary sub folders
