@@ -41,33 +41,57 @@ FileHandler *FileHandler::getInstance() {
 	return pFileHandler;
 }
 
-bool FileHandler::rmdir(std::string str_dirname) {
-	const char *dirname	= str_dirname.c_str();
+bool FileHandler::isDirPresent(std::string strBaseDir, std::string strDirName) {
+	const char *baseDir	= strBaseDir.c_str();
+	const char *dir2Chk	= strDirName.c_str();
+
+	DIR *pDir;
+	struct dirent *pDirEntry;
+
+	pDir = opendir(baseDir);
+	if (pDir == NULL) {
+		return false;
+	}
+
+	while( NULL != (pDirEntry = readdir(pDir)) ) {
+		if (!strcmp(pDirEntry->d_name, ".") || !strcmp(pDirEntry->d_name, "..")) {
+			continue;
+		}
+
+		if (DT_DIR == pDirEntry->d_type && !strcmp(dir2Chk, pDirEntry->d_name)) {
+			closedir(pDir);
+			return true;
+		}
+	}
+	closedir(pDir);
+	return false;
+}
+
+bool FileHandler::rmdir(std::string str_dirname, bool bRemoveBase) {
+    const char *dirname	= str_dirname.c_str();
     DIR *dir;
     struct dirent *entry;
     char path[PATH_MAX];
 
-    dir = opendir(dirname);
-    if (dir == NULL) {
-        return false;
-    }
+    dir		= opendir(dirname);
+    if(dir == NULL) return false;
 
     while (NULL != (entry = readdir(dir)) ) {
         if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, "..")) {
-			continue;
-		}
+            continue;
+	}
 
-		snprintf(path, (size_t) PATH_MAX, "%s/%s", dirname, entry->d_name);
-		if (entry->d_type == DT_DIR) {
-			rmdir(path);
-		}
-		remove(path);
-   }
+	snprintf(path, (size_t) PATH_MAX, "%s/%s", dirname, entry->d_name);
+	if (entry->d_type == DT_DIR) {
+            rmdir(path);
+	}
+	remove(path);
+    }
 
     closedir(dir);
-	remove(dirname);
+    if(bRemoveBase) remove(dirname);
 
-	return true;
+    return true;
 }
 
 int FileHandler::copy_data(struct archive * ar, struct archive * aw) {
@@ -192,16 +216,10 @@ void *FileHandler :: run(void *pUserData) {
 		cmdNo		= qVal.second;
 
 		info_log << "FileHandler: Got a extract request. CmdNo: " << cmdNo << ", Folder: " << strFolder << std::endl;
-		//	delete the temporary download folder where previous downloads may exist
-		std::string tmp_dwld_path	= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_DOWNLOAD_PATH) + strFolder;
-		info_log << "FileHandler: Deleting file " << tmp_dwld_path << std::endl;
-		pThis->rmdir(tmp_dwld_path);
 
-		//	extract the downloaded file in temp path and make sure it is extracting properly
-		std::string dwld_path	= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_DOWNLOAD_PATH);
-
-		//	check if extract is working
+		std::string dwld_path	= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_DOWNLOAD_FOLDER);
 		chdir(dwld_path.c_str());
+
 		std::string strZipFile	= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_DOWNLOAD_FILE);
 		if(pThis->extract(strZipFile)) {
 			info_log << "FileHandler: File Extract Check: Through" << std::endl;
@@ -210,8 +228,14 @@ void *FileHandler :: run(void *pUserData) {
 			info_log << "Now deleting the actual folder" << std::endl;
 			pThis->rmdir(strDstPath);
 
-			//	extract the downloaded file to app path
-			chdir(TECHNO_SPURS_ROOT_PATH);
+			//	Create a folder if it is not already
+			if(!pThis->isDirPresent(dwld_path, strFolder)) {
+				mkdir(strDstPath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+				chdir(strDstPath.c_str());
+			} else {
+				chdir(TECHNO_SPURS_ROOT_PATH);
+			}
+
 			if(pThis->extract(strZipFile)) {
 				info_log << "FileHandler: Extracted zip file: " << strZipFile << " for command no " << cmdNo << std::endl;
 				//	Send a success message, probably with a version
@@ -221,7 +245,7 @@ void *FileHandler :: run(void *pUserData) {
 				Utils::sendPacket(WDOG_Tx_PORT, "{\"command\":\"upload_logs\"}");
 				info_log << "FileHandler: Going to reboot in 30 secs..." << std::endl;
 				info_log.uploadLogs();
-				sleep(30);	// Let us wait for a min & reboot
+				sleep(30);	// Let us wait for 30 secs
 
 				Utils::sendPacket(WDOG_Tx_PORT, "{\"command\":\"reboot\"}");
 			}
@@ -231,6 +255,9 @@ void *FileHandler :: run(void *pUserData) {
 			strResp	= pThis->makeRespPkt(cmdNo, strUnqId, false, "failed extracting zip");
 			pJabberClient->sendMsgTo(strResp, cPanelJid);
 		}
+
+		info_log << "FileHandler: Deleting fileS at " << dwld_path << "/*" << std::endl;
+		pThis->rmdir(dwld_path, false);
 	}
 	return NULL;
 }

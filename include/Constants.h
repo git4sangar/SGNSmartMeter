@@ -46,7 +46,7 @@
 #define TECHNO_SPURS_CFG_FILE       "CFG/config_file.bin"
 #define TECHNO_SPURS_CERT_FILE      "Certs/cacert.pem"
 #define TECHNO_SPURS_DOWNLOAD_FILE  "Downloads/new_update.zip"
-#define TECHNO_SPURS_DOWNLOAD_PATH	"Downloads/"
+#define TECHNO_SPURS_DOWNLOAD_FOLDER	"Downloads"
 #define TECHNO_SPURS_TEMP_DWLD_PATH	"Downloads/SmartMeter"
 #define TECHNO_SPURS_APP_FOLDER		"SmartMeter"
 #define TECHNO_SPURS_JABBER_LOG		"Logs/jabber_logs_"
@@ -61,7 +61,7 @@
 #define MAX_RETRY_COUNT			(3)
 #define MAX_LOG_SIZE			ONE_MB
 #define MODULE_NAME				"JabberClient"
-#define WDOG_PROC_NAME			"watchdog"
+#define WDOG_PROC_NAME			"WatchDog"
 
 class XmppDetails {
     std::string client_jid,

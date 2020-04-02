@@ -60,7 +60,7 @@ Important Note:
 			{
 				"command":"smart_meter_update",
 				"command_no" : 10,
-				"url":"https://technospurs.com/imageSets.zip",
+				"url":"https://smswdownload.s3.us-east-2.amazonaws.com/SmartMeter.zip",
 				"processes" :
 				[
 				  {"process_name" : "process1","version":1},
@@ -87,7 +87,7 @@ Important Note:
 
 	Additional Info
 	===============
-	on unzipping, it shall yield "SmartMeter" folder with necessary sub folders
+	on unzipping, it shall yield "SmartMeter" folder with necessary sub folders. Please use zip command in ubunut like this. "zip -r SmartMeter.zip ./SmartMeter"
 	comman_no	=>	uniquely identifies a particular request among the series of requests.
 					for eg: if a "s/w update req" is made to a number of Smart Meters, say, for upgrading to ver1.3.2, the command-no val, say 10, is same for all the Smart Meters.
 					So the command-no 10 uniquely identifies the "s/w update req ver1.3.2" to the given set of Smart Meters
