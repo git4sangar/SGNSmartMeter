@@ -238,8 +238,13 @@ void *FileHandler :: run(void *pUserData) {
 
 			if(pThis->extract(strZipFile)) {
 				info_log << "FileHandler: Extracted zip file: " << strZipFile << " for command no " << cmdNo << std::endl;
-				//	Send a success message, probably with a version
-				strResp	= pThis->makeRespPkt(cmdNo, strUnqId, true, "");
+
+				//	Extraction is succeeded. Delete all files at Download folder
+				info_log << "FileHandler: Deleting files at " << dwld_path << "/*" << std::endl;
+				pThis->rmdir(dwld_path, false);
+
+				//	Send a success message
+				strResp	= pThis->makeRespPkt(cmdNo, strUnqId, true, strFolder);
 				pJabberClient->sendMsgTo(strResp, cPanelJid);
 
 				Utils::sendPacket(WDOG_Tx_PORT, "{\"command\":\"upload_logs\"}");
@@ -255,9 +260,6 @@ void *FileHandler :: run(void *pUserData) {
 			strResp	= pThis->makeRespPkt(cmdNo, strUnqId, false, "failed extracting zip");
 			pJabberClient->sendMsgTo(strResp, cPanelJid);
 		}
-
-		info_log << "FileHandler: Deleting fileS at " << dwld_path << "/*" << std::endl;
-		pThis->rmdir(dwld_path, false);
 	}
 	return NULL;
 }
