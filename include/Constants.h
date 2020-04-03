@@ -35,7 +35,7 @@
 
 #define ONE_KB  		(1024)
 #define ONE_MB  		(ONE_KB * ONE_KB)
-#define WAIT_TIME_SECs	(2 * 60)
+#define WAIT_TIME_SECs	(60)
 #define WDOG_Tx_PORT	(4951)
 #define WDOG_Rx_PORT	(4952)
 
@@ -56,7 +56,7 @@
 #define TECHNO_SPURS_WDOG_FOLDER	"WDog"
 #define TECHNO_SPURS_WDOG_FILE		"WDog/WatchDog"
 
-#define MAX_BUFF_SIZE			(10 * ONE_KB)
+#define MAX_BUFF_SIZE			(16 * ONE_KB)
 #define MAX_FILE_SIZE           ONE_MB
 #define MAX_RETRY_COUNT			(3)
 #define MAX_LOG_SIZE			ONE_MB
