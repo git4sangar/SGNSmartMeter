@@ -29,6 +29,8 @@ Logger::Logger() : bTime (true), writeLock(PTHREAD_MUTEX_INITIALIZER) {
 	pthread_t logger_thread;
 	pthread_create(&logger_thread, NULL, &run, this);
 	pthread_detach(logger_thread);
+	std::string strFile	= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_JABBER_LOG);
+	fp = fopen( (char *)strFile.c_str(), "w");
 	/*time_t now;
 	time(&now);
 	char suffix[32];
@@ -65,6 +67,7 @@ void Logger::uploadLogs() {
 
 Logger &Logger::operator << (StandardEndLine manip) {
 	pthread_mutex_lock(&writeLock);
+	fprintf(fp, "\n"); fflush(fp);
 	ss_log << std::endl; std::cout << std::endl; bTime = true;
 
 	ss_log.seekg(0, std::ios::end);
@@ -80,6 +83,7 @@ Logger &Logger::operator << (StandardEndLine manip) {
 Logger &Logger::operator <<(const std::string strMsg) {
 	pthread_mutex_lock(&writeLock);
 	if(bTime) { stampTime(); bTime = false; }
+	fprintf(fp, "%s", strMsg.c_str()); fflush(fp);
 	ss_log << strMsg; std::cout << strMsg;
 	pthread_mutex_unlock(&writeLock);
 	return *this;
@@ -88,6 +92,7 @@ Logger &Logger::operator <<(const std::string strMsg) {
 Logger &Logger::operator <<(int iVal) {
 	pthread_mutex_lock(&writeLock);
 	if(bTime) { stampTime(); bTime = false; }
+	fprintf(fp, "%d", iVal); fflush(fp);
 	ss_log << iVal; std::cout << iVal;
 	pthread_mutex_unlock(&writeLock);
 	return *this;

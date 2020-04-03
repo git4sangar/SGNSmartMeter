@@ -22,6 +22,7 @@ class Logger {
     bool bTime;
     pthread_mutex_t writeLock;
 	std::queue<std::string> logQ;
+	FILE *fp;
 
 	std::stringstream ss_log;
 	Logger();

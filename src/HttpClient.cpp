@@ -216,15 +216,15 @@ void *HttpClient :: run(void *pHttpClient) {
             		unlink(file_name.c_str());
             		std::stringstream ss;
             		ss << "{ \"from\" : \"" << strUnqId << "\" ,\"command\" : \""
-            				<< pReqPkt->getCmd() << "\", \"success\" : \"true\", \"command_no\" : "
+            				<< pReqPkt->getCmd() << "\", \"success\" : true, \"command_no\" : "
 							<< pReqPkt->getCmdNo() << " }" << std::endl;
             		pJbrCli->sendMsgTo(ss.str(), cPanelJid);
             	}
             } else {
             	std::stringstream ss;
             	ss << "{ \"from\" : \"" << strUnqId << "\" ,\"command\" : \""
-					<< pReqPkt->getCmd() << "\", \"success\" : \"false\", \"command_no\" : "
-					<< pReqPkt->getCmdNo() << " }" << std::endl;
+					<< pReqPkt->getCmd() << "\", \"success\" : false, \"command_no\" : "
+					<< pReqPkt->getCmdNo() << ", \"http_resp_code\" : " << respCode << " }" << std::endl;
 				pJbrCli->sendMsgTo(ss.str(), cPanelJid);
             	info_log << "HttpClient: Error: Command No: " << pReqPkt->getCmdNo()
             			<< ", res: " << res

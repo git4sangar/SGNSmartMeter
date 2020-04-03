@@ -20,7 +20,7 @@
 
 int main() {
 	Logger &info_log = Logger::getInstance(); sleep(1);
-	info_log << "Starting Application version " << JABBER_CLIENT_VERSION << std::endl;
+	info_log << "Main: Starting Application version " << JABBER_CLIENT_VERSION << std::endl;
 
 	//	Sleep for 2 mins so that all python process get up & would've sent a heart beat req
 	sleep(WAIT_TIME_SECs);
