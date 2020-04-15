@@ -185,7 +185,7 @@ void MessageHandler::sendHeartBeat() {
 		strHeartBeat	= jsRoot.getJsonString();
 	}
 
-	info_log << "MessageHandler: Sending Heartbeat " << strHeartBeat << std::endl;
+	//info_log << "MessageHandler: Sending Heartbeat " << strHeartBeat << std::endl;
 	Utils::sendPacket(WDOG_Tx_PORT, strHeartBeat);
 }
 
@@ -341,7 +341,7 @@ void *heartBeat(void *pUserData) {
 	log << "Starting Heartbeat thread" << std::endl;
 	while(true) {
 		sleep(25);
-		log << "Main: Sending HeartBeat msg to self JID" << std::endl;
+		//log << "Main: Sending HeartBeat msg to self JID" << std::endl;
 		pJabberClient->sendPresence(pConfig->getXmppDetails().getCPanelJid());
 		pJabberClient->sendMsgTo(strCmd, pConfig->getXmppDetails().getClientJid());
 	}
@@ -363,7 +363,7 @@ void *wdogRespThread(void *pUserData) {
     clientlen   = sizeof(struct sockaddr_in);
     while(true) {
 		JsonFactory jsRoot;
-		recvd       = recvfrom(sockfd, buf, MAX_BUFF_SIZE, 0, (struct sockaddr *) &clientaddr, (socklen_t*)&clientlen);
+		recvd       = recvfrom(sockfd, buf, MAX_BUFF_SIZE-1, 0, (struct sockaddr *) &clientaddr, (socklen_t*)&clientlen);
 		buf[recvd]  = '\0';
 		log << "Main: Got WatchDog response " << buf << std::endl;
 		try {
