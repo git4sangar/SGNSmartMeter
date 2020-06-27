@@ -109,6 +109,23 @@ void HttpClient::uploadLogs(int cmdNo, std::string fileName, std::string strLogD
 	pushToQ(pRqPkt);
 }
 
+void HttpClient::postReq(std::string strUrl, std::string strPLoad) {
+	if(strPLoad.empty()) {
+		info_log << "HttpClient: Invalid post payload" << std::endl;
+		return;
+	}
+	HttpReqPkt *pRqPkt	= new HttpReqPkt();
+	pRqPkt->setReqType(HTTP_REQ_TYPE_POST);
+	pRqPkt->setUrl(strUrl);
+	pRqPkt->setUserData(strPLoad);
+
+	pRqPkt->addHeader(std::string("Accept: application/json"));
+	pRqPkt->addHeader(std::string("Content-Type: application/json"));
+
+	info_log << "HttpClient: Making POST request with payload: " << strPLoad << std::endl;
+	pushToQ(pRqPkt);
+}
+
 void HttpClient :: pushToQ(HttpReqPkt *pReqPkt) {
 	if(pReqPkt) {
 		pthread_mutex_lock(&mtxgQ);
@@ -138,6 +155,7 @@ void *HttpClient :: run(void *pHttpClient) {
     FILE    *write_data;
     CURLcode res = CURLE_OK;
     struct curl_slist* curl_hdrs;
+    char pPostPayLoad[MAX_BUFF_SIZE];
 
     curl_mime *form = NULL;
 	curl_mimepart *field = NULL;
@@ -198,10 +216,18 @@ void *HttpClient :: run(void *pHttpClient) {
 					curl_mime_filedata(field, file_name.c_str());
 					curl_easy_setopt(curl, CURLOPT_MIMEPOST, form);
 					break;
+
+				case HTTP_REQ_TYPE_POST:
+					bzero(pPostPayLoad, MAX_BUFF_SIZE);
+					//	Need to copy to a buffer & make POST request. Otherwise not working
+					strncpy(pPostPayLoad, pReqPkt->getUserData().c_str(), (MAX_BUFF_SIZE-1));
+					curl_easy_setopt(curl, CURLOPT_POST, 1L);
+					curl_easy_setopt(curl, CURLOPT_POSTFIELDS, pPostPayLoad);
+					break;
             }
 
             res = curl_easy_perform(curl);
-            if(write_data) fclose(write_data);
+            if(write_data) { fclose(write_data); write_data = NULL; }
 
             CURLcode infoResp = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &respCode);
             if(CURLE_OK == res && CURLE_OK == infoResp && respCode >= 200 && respCode <= 299) {
@@ -219,6 +245,11 @@ void *HttpClient :: run(void *pHttpClient) {
             				<< pReqPkt->getCmd() << "\", \"success\" : true, \"command_no\" : "
 							<< pReqPkt->getCmdNo() << " }" << std::endl;
             		pJbrCli->sendMsgTo(ss.str(), cPanelJid);
+            	}
+
+            	//	For POST request, nothing needs to be handled. So be quiet
+            	if(HTTP_REQ_TYPE_POST	== pReqPkt->getReqType()) {
+            		info_log << "HttpClient: POST response: " << respCode << std::endl;
             	}
             } else {
             	std::stringstream ss;

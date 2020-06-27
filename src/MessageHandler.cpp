@@ -362,7 +362,7 @@ void *wdogRespThread(void *pUserData) {
     int sockfd	= Utils::prepareRecvSock(WDOG_Rx_PORT);
     clientlen   = sizeof(struct sockaddr_in);
     while(true) {
-		JsonFactory jsRoot;
+		JsonFactory jsRoot, jsPanel;
 		recvd       = recvfrom(sockfd, buf, MAX_BUFF_SIZE-1, 0, (struct sockaddr *) &clientaddr, (socklen_t*)&clientlen);
 		buf[recvd]  = '\0';
 		log << "Main: Got WatchDog response " << buf << std::endl;
@@ -381,6 +381,18 @@ void *wdogRespThread(void *pUserData) {
 			case UPLOAD_LOGS:
 				jsRoot.validateJSONAndGetValue("log_data", strData);
 				HttpClient::getInstance()->uploadLogs(0, TECHNO_SPURS_WDOG_LOG, strData);
+				break;
+
+			case SMART_TV_MAC:
+				jsRoot.validateJSONAndGetValue("tv_mac", strData);
+
+				jsPanel.addStringValue("panel_id", Config::getInstance()->getRPiUniqId());
+				jsPanel.addStringValue("panel_map_id", strData);
+				jsPanel.addStringValue("panel_jid", Config::getInstance()->getXmppDetails().getClientJid());
+				jsPanel.addStringValue("panel_jid_password", Config::getInstance()->getXmppDetails().getClientPwd());
+				jsPanel.addStringValue("panel_session", " ");
+				jsPanel.addStringValue("panel_status", " ");
+				HttpClient::getInstance()->postReq(ADD_PANEL_URL, jsPanel.getJsonString());
 				break;
 			}
 		} catch(JsonException &je) { log << "Json Exception" << std::endl;}

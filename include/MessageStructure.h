@@ -22,7 +22,8 @@
 #define	BLANK_CMD		(9)
 #define XMPP_RECONNECT		(10)
 #define HEART_BEAT		(11)
-#define MAX_COMMANDS        	(12)
+#define SMART_TV_MAC        	(12)
+#define MAX_COMMANDS        	(13)
 
 class MessageStructure {
     std::map<std::string, int> headers;
