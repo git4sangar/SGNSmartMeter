@@ -20,6 +20,7 @@ MessageStructure::MessageStructure() {
     headers["reconnect_jabber"]		= XMPP_RECONNECT;
     headers["reboot_system"]		= REBOOT_SYSTEM;
     headers["heart_beat"]		= HEART_BEAT;
+    headers["smart_tv_mac"]		= SMART_TV_MAC;
 }
 
 int MessageStructure::getCommandVal(std::string strCmd) {

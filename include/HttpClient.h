@@ -22,6 +22,8 @@
 
 #define	HTTP_REQ_TYPE_DWLD	(1)
 #define	HTTP_REQ_TYPE_UPLD	(2)
+#define HTTP_REQ_TYPE_GET	(3)
+#define HTTP_REQ_TYPE_POST	(4)
 
 class HttpReqPkt {
 	std::vector<std::string> headers;
@@ -68,6 +70,8 @@ public:
     void smartMeterUpdate(int cmdNo, std::string strUrl);
     void jabberClientUpdate(int cmdNo, std::string strUrl);
     void watchDogUpdate(int cmdNo, std::string strUrl);
+
+    void postReq(std::string strUrl, std::string strPLoad);
 
     void subscribeListener(HttpResponse *pObj) { pListener = pObj; }
     void pushToQ(HttpReqPkt *pReqPkt);

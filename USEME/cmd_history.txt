@@ -1,0 +1,158 @@
+    1  clear
+    2  ifconfig
+    3  exit
+    4  clear
+    5  ls -l
+    6  exit
+    7  cat /proc/cpuinfo 
+    8  free -h
+    9  w
+   10  du -hs
+   11  cat /proc/meminfo 
+   12  ping google.com
+   13  exit
+   14  clear
+   15  ls -l
+   16  cd sgn
+   17  ls
+   18  ls -l
+   19  gcc
+   20  g++
+   21  mkdir projs
+   22  cd projs/
+   23  pwd
+   24  cd ..
+   25  mkdir smpls
+   26  cd smpls/
+   27  pwd
+   28  exit
+   29  cd sgn/smpls/
+   30  ls -l
+   31  gcc up.c -o up -lssl -lcrypto -lcurl
+   32  cd /usr/local/lib
+   33  ls -l
+   34  cd -
+   35  cd ../
+   36  ls -l
+   37  mkdir -p dev/libsrc
+   38  cd dev/libsrc/
+   39  sudo apt-get install git
+   40  sudo apt-get update
+   41  sudo apt-get install git
+   42  git clone https://github.com/openssl/openssl.git
+   43  cd openssl/
+   44  ls -l
+   45  git log
+   46  git checkout 1.1.1e
+   47  git checkout OpenSSL_1_1_1e
+   48  git log
+   49  ls -l
+   50  ./config --help
+   51  vim INSTALL
+   52  sudo apt-get install vim
+   53  vim INSTALL
+   54  make
+   55  ./config
+   56  make
+   57  make install
+   58  sudo make install
+   59  ls -l /usr/local/lib/
+   60  history | grep local
+   61  cd ~/sgn/smpls/
+   62  ls -l
+   63  gcc up.c -o up -lssl -lcrypto
+   64  cd -
+   65  cd ..
+   66  git clone https://github.com/curl/curl.git
+   67  cd curl/
+   68  ls -l
+   69  git checkout curl-7_68_0
+   70  ls -l
+   71  mkdir build
+   72  ./configure --help
+   73  autoconf
+   74  sudo apt-get install autoconf
+   75  autoconf 
+   76  ls -l
+   77  ./buildconf 
+   78  sudo apt-get install libtoolize
+   79  sudo apt-get install libtool
+   80  ./buildconf 
+   81  ls -l
+   82  ./configure --help
+   83  ./configure
+   84  make -j8
+   85  sudo make install
+   86  cd ~/sgn/smpls/
+   87  ls -l
+   88  gcc up.c -o up -lssl -lcrypto -lcurl
+   89  ls -l
+   90  ./up
+   91  ls -l
+   92  vim up.c
+   93  cd -
+   94  cd ..
+   95  ls -l
+   96  git clone https://github.com/akheron/jansson.git
+   97  cd jansson/
+   98  ls -l
+   99  git checkout v2.12
+  100  git log
+  101  clear
+  102  ls -l
+  103  autoconf 
+  104  ls -l
+  105  ./configure 
+  106  mkdir build
+  107  cd build/
+  108  cmake ..
+  109  sudo apt-get install cmake
+  110  cmake ..
+  111  make -j8
+  112  sudo make install
+  113  cd ../..
+  114  git clone Install the project...
+  115  -- Install configuration: ""
+  116  -- Installing: /usr/local/lib/libjansson.a
+  117  -- Installing: /usr/local/include/jansson_config.h
+  118  -- Installing: /usr/local/include/jansson.h
+  119  -- Installing: /usr/local/lib/pkgconfig/jansson.pc
+  120  -- Installing: /usr/local/lib/cmake/jansson/janssonConfig.cmake
+  121  -- Installing: /usr/local/lib/cmake/jansson/janssonConfigVersion.cmake
+  122  -- Installing: /usr/local/lib/cmake/jansson/janssonTargets.cmake
+  123  -- Installing: /usr/local/lib/cmake/jansson/janssonTargets-noconfig.cmakeclear
+  124  git clone Install the project...
+  125  -- Install configuration: ""
+  126  -- Installing: /usr/local/lib/libjansson.a
+  127  -- Installing: /usr/local/include/jansson_config.h
+  128  -- Installing: /usr/local/include/jansson.h
+  129  -- Installing: /usr/local/lib/pkgconfig/jansson.pc
+  130  -- Installing: /usr/local/lib/cmake/jansson/janssonConfig.cmake
+  131  -- Installing: /usr/local/lib/cmake/jansson/janssonConfigVersion.cmake
+  132  -- Installing: /usr/local/lib/cmake/jansson/janssonTargets.cmake
+  133  git clone https://github.com/libarchive/libarchive.git
+  134  git checkout v3.4.2
+  135  cd libarchive/
+  136  git checkout v3.4.2
+  137  ls -l
+  138  vim INSTALL
+  139  ls -l
+  140  mkdir build
+  141  cd build/
+  142  ls -l
+  143  make -j4
+  144  cd ..
+  145  autoconf
+  146  ls -l
+  147  ./configure
+  148  vim README.md 
+  149  vim INSTALL 
+  150  ./build/autogen.sh 
+  151  ls -l
+  152  ./configure 
+  153  make -j8
+  154  sudo make install
+  155  clear
+  156  history
+  157  cd ..
+  158  history > cmd_history.txt

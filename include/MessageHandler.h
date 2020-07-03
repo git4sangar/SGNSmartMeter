@@ -17,6 +17,8 @@
 #include "JabberResponse.h"
 #include "FileLogger.h"
 
+#define	ADD_PANEL_URL	"http://ec2-3-135-62-120.us-east-2.compute.amazonaws.com:3000/api/panels"
+
 class MessageHandler : public HttpResponse, public JabberResponse {
     std::queue<std::string> msgQ;
     pthread_mutex_t qLock;

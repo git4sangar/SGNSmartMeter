@@ -1,14 +1,15 @@
 sgn
 
-28-Mar-2020
-Release Version 01
+16-Apr-2020
+Release Version 03
 
 Provisioning a new RPi
+
 (01) Install the Raspbian Buster Lite on SD Card
 
 (02) Change the Pi password as follows
         (a) openssl passwd -1 -salt <salt> <passwd>
-                        eg: openssl passwd -1 -salt techno Welcome123$
+		eg: openssl passwd -1 -salt techno Welcome123$
         (b) note down the output
         (c) sudo vim /path/to/sdcard/etc/shadow
         (d) locate the line that starts with pi and replace the text between the first and second ":" with the above output
@@ -24,75 +25,103 @@ Provisioning a new RPi
                 (e) /path/to/sdcard/home/pi/Technospurs/SmartMeter
                 (f) /path/to/sdcard/home/pi/Technospurs/JabberClient
                 (g) /path/to/sdcard/home/pi/Technospurs/Logs
-Important Note:
----------------
+	Important Note:
+	---------------
 	-> The first line of the python script shall be as follows
 		#!/usr/bin/python3.7
 	-> The script shall have execute permission set. (ls -l shall yield "-rwxr-xr-x" for that python script)
 
-(07) copy the certificates to /path/to/sdcard/home/pi/technospurs/Certs/cacert.pem => I will hardcode this. If required, we can replace this file through software update
-(08) copy the python code to /path/to/sdcard/home/pi/technospurs/ (folder name is Smartmeter right?) -> make sure execute permission
-(09) copy the xmpp client & watch dog server code to /path/to/sdcard/home/pi/technospurs/JabberClient -> make sure execute permission
-(10) copy the dependencies (libxxx.so files) to /usr/local/lib
-(11) copy the watchdog server to /path/to/sdcard/home/root/ with "sudo chown root /home/root/WatchDog"
-(12) copy the ld.so.cache to /path/to/sdcard/etc -> this makes sure our libs in /usr/local/lib are loaded by linux-loader. Check if /path/to/sdcard/etc/ld.so.conf.d/libc.conf contains /usr/local/lib
-(13) Update the cron tab for root user & pi-user
-(14) encrypt the xmpp client credentials (as follows), encrypt it & save as config_file.bin and copy it to /path/to/sdcard/home/pi/technospurs/cfg
-                        {
-							"xmpp_client" : {
-								"client_jid" : "altimeter_0001@im.koderoot.net",
-								"client_password" : "abcd1234",
-								"cpanel_jid" : "technospurs@im.koderoot.net"
-							},
-							"rpi_unique_id"	: "mac-address"
-						}
-                I will provide a console based tool for generating the encryption
+(07) copy the certificates to /path/to/sdcard/home/pi/technospurs/Certs/cacert.pem => I will hardcode this.
+		If required, we can replace this file through software update
 
-				Additional Info
-				===============
-					(a) the file name config_file.bin is important
-					(b) 256 bit key used
-					(c) Symmetric Key: "01234567890123456789012345678901"
-					(d) Salt: "0123456789012345"
+(08) copy the python code to /path/to/sdcard/home/pi/technospurs/ (folder name is Smartmeter right?)
+		-> make sure execute permission & update cron file for user
 
-(15) A xmpp message to trigger a download shall look like this
+(09) copy all the dependencies (libxxx.so files) to /usr/local/lib
+
+(10) copy the JabberClient binary to /path/to/sdcard/home/pi/technospurs/JabberClient
+		-> note the folder name where you copy the binary "JabberClient" is also named "JabberClient"
+		-> make sure the file has execute permission (chmod 755 /path/to/sdcard/home/pi/technospurs/JabberClient)
+		-> update the cron tab for user "pi" to execute this on reboot
+
+(11) copy the watchdog server to /path/to/sdcard/root/
+		-> make sure the file has execute permission (sudo chown root /home/root/WatchDog)
+		-> update the cron tab for "root" user to execute this on reboot
+
+(12) copy the ld.so.cache to /path/to/sdcard/etc -> this makes sure our libs in /usr/local/lib are loaded by linux-loader.
+		Check if /path/to/sdcard/etc/ld.so.conf.d/libc.conf contains /usr/local/lib
+
+(13) encrypt the xmpp client credentials (as follows), encrypt it & save as config_file.bin
+	-> copy it to /path/to/sdcard/home/pi/technospurs/CFG
+    	{
+		"xmpp_client" : {
+			"client_jid" : "altimeter_0001@im.koderoot.net",
+			"client_password" : "abcd1234",
+			"cpanel_jid" : "technospurs@im.koderoot.net"
+		},
+		"rpi_unique_id"	: "mac-address"
+	}
+	I will provide a console based tool for generating the encryption
+
+		Additional Info
+		===============
+			(a) the file name config_file.bin is important
+			(b) 256 bit key used
+			(c) Symmetric Key: "01234567890123456789012345678901"
+			(d) Salt: "0123456789012345"
+
+(14) A xmpp message to trigger a download shall look like this
 	For SmartMeter
-			{
-				"command":"smart_meter_update",
-				"command_no" : 10,
-				"url":"https://smswdownload.s3.us-east-2.amazonaws.com/SmartMeter.zip",
-				"processes" :
-				[
-				  {"process_name" : "process1","version":1},
-				  {"process_name" : "process2","version":1},
-				  {"process_name" : "process3","version":1}
-				]
-			}
+		{
+			"command":"smart_meter_update",
+			"command_no" : 10,
+			"url":"https://smswdownload.s3.us-east-2.amazonaws.com/SmartMeter.zip",
+			"processes" :
+			[
+			  {"process_name" : "process1","version":1},
+			  {"process_name" : "process2","version":1},
+			  {"process_name" : "process3","version":1}
+			]
+		}
 	
 	For JabberClient
 		{
-			"command"		: "jabber_client_update",
+			"command"	: "jabber_client_update",
 			"command_no"	: 11,
-			"url"			: "https://technospurs.com/imageSets.zip",
-			"version"		: 2
+			"url"		: "https://smswdownload.s3.us-east-2.amazonaws.com/JabberClient.zip",
+			"version"	: 3
 		}
 
 	For WatchDog
 		{
-			"command"		: "watchdog_update",
+			"command"	: "watchdog_update",
 			"command_no"	: 12,
-			"url"			: "https://technospurs.com/imageSets.zip",
-			"version"		: 3
+			"url"		: "https://smswdownload.s3.us-east-2.amazonaws.com/WatchDog.zip",
+			"version"	: 3
+		}
+
+	For CA Cert
+		{
+			"command"	: "ca_cert_file_update",
+			"command_no"	: 12,
+			"url"		: "https://smswdownload.s3.us-east-2.amazonaws.com/CACert.zip",
+			"version"	: 3
 		}
 
 	Additional Info
 	===============
-	on unzipping, it shall yield "SmartMeter" folder with necessary sub folders. Please use zip command in ubunut like this. "zip -r SmartMeter.zip ./SmartMeter"
+	on unzipping, it shall yield "SmartMeter" folder with necessary sub folders.
+	Please use zip command in ubunut like this. "zip -r SmartMeter.zip ./SmartMeter"
 	comman_no	=>	uniquely identifies a particular request among the series of requests.
-					for eg: if a "s/w update req" is made to a number of Smart Meters, say, for upgrading to ver1.3.2, the command-no val, say 10, is same for all the Smart Meters.
-					So the command-no 10 uniquely identifies the "s/w update req ver1.3.2" to the given set of Smart Meters
+				for eg: 
+					if a "s/w update req" is made to a number of Smart Meters, say,
+					for upgrading to ver1.3.2,
+					the command-no val, say 10, is same for all the Smart Meters.
+					So the command-no 10 uniquely identifies the "s/w update req ver1.3.2"
+					to the given set of Smart Meters
 
-					the response contains this number, saying, upgrade-request v1.3.2 for Smart Meter is success or failure
+					the response contains this number, saying, upgrade-request v1.3.2
+					for Smart Meter is success or failure
 					increment this command-no for every new request of any type
 
 	The response will be as follows
@@ -102,20 +131,28 @@ Important Note:
 		"succcess"	: true or false,
 		"remarks"	: ""
 	}
-	remarks => conveys the error in case of failure
+	remarks => conveys the what is udpated like SmartMeter, JabberClient etc...
+			Or error in case of failure
 
-(16) Get Version Info
+(15) Get Version Info
 		Req Packet is like this =>	{"command":"version_req"}
 		No need for command no
-		Response Packet:  {
-								"command"	: "version_req",
-								"from"		: "value of rpi_unique_id as provided in config file",
-								"processes" : [
-										{"process_name" : "process1", "version" : 1, "isDead" : false},
-										{"process_name" : "process2", "version" : 1, "isDead" : false}
-									]
-							}
+		Response Packet:
+		{
+			"command"	: "version_req",
+			"from"		: "value of rpi_unique_id as provided in config file",
+			"processes" : [
+					{"process_name" : "process1", "version" : 1, "isDead" : false},
+					{"process_name" : "process2", "version" : 1, "isDead" : false}
+				]
+		}
 		isDead -> true means the process is not running more than a minute
+
+(16) For System reboot
+		{ "command" : "reboot_system" }
+
+		It takes 30 secs to reboot.
+		Before rebooting, all pending logs are uploaded
 
 (17) Upload Logs
 		Req Packet is like this => {"command":"upload_logs"}
@@ -125,13 +162,15 @@ Important Note:
 			"from"		: "value of rpi_unique_id as provided in config file",
 			"success"	: true
 		}
-		
+		When logs are over certain threshold they are automatically uploaded
+		-> in such case a jabber message is pushed to panel-JID
 
-(18) Hearbeat to be given to Watchdog task atleast 25 secs once. Every 30secs watchdog looks for a heart beat from all the processes
-	IP: 127.0.0.1
+(18) Hearbeat to be given to Watchdog task atleast 25 secs once.
+	Every 30secs watchdog looks for a heart beat from all the processes
+	IP: localhost / 127.0.0.1
 	UDP Port: 4951
 	{
-		"command"			: "heart_beat",
+		"command"		: "heart_beat",
 		"process_name"		: "name of the process",
 		"pid_of_process"	: 444,
 		"run_command"		: "/home/pi/technospurs/SmartMeter/ocr.py",
@@ -152,11 +191,13 @@ network={
 	psk="Welcome123$"
 }
 
-Note: The android phone used for setting the WiFi details shall have the "Hotspot name" as technospurs and "Hotsport password" as Welcome123$
-	This makes sure, the raspberry pi device gets connected to the android phone's hotspot when powered on
+	Note: The android phone used for setting the WiFi details shall have
+			the "Hotspot name" as technospurs and "Hotsport password" as Welcome123$
+			This makes sure, the raspberry pi device gets connected to the
+			android phone's hotspot when powered on
 
 (20) Sequence Diagram
-	================
+	 ================
 Save the following in a file with "drawio" as extension. Open the same using https://app.diagrams.net/ (draw.io)
 
 <mxfile host="app.diagrams.net" modified="2020-03-28T11:24:18.057Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.100 Safari/537.36" etag="yFNP4uiRWfF4OIrjE9D-" version="12.9.3" type="device"><diagram id="lON9Sp3gBH4uLDnKN_vK" name="Page-1">5VvbcqM4EP0aP04KBL49xk52MlO7VdlN1WbmaUsGGVQrkEfg2379SkHYoMaJ7QIT45cENaIlus+Rutui50yjzVeBF+Ef3Ceshyx/03MeegjZTn8o/ynJNpMMh1oQCOrrTnvBC/2PaKGlpUvqk6TUMeWcpXRRFno8jomXlmRYCL4ud5tzVh51gQMCBC8eZlD6Sv00zKQjNNzLnwgNwnxkezDO7kQ476zfJAmxz9cFkfPYc6aC8zS7ijZTwpTxcrtkz/124O5uYoLE6TEPiC/s6+TP8Mm7n33z0x+/J85i9kVrWWG21C+sJ5tucwuQ2L9XhpStmMdSOAnTiMmWLS/l2GL7Qzasu37e/Fm896CQYO1aW93KRiE+MP7+bXJvYxGQ9J1X6O9sKUFIeETkOPK59d5bfe2BsOCoXCYIwyldlaeBNWiCnbrdCM+cygkiKwf4QOvR8HYtq6wi4UvhEf1U0TsfKLJtQ1FmB6BIXhReey96c/4JQEDXD4Rxm0Bwa8KB2y4MnOuHwbBNGKBRTTgwFV0aCO71A2HU7npQ24LQLhD6AAivDzwAYEjJJi0jIEkF/5dMOeNij5A5ZcwQYUaDWDY96WAi5ZMVESmVEdi9vhFR31fDTNYhTcnLAntqzLWMN6VM8GXsE7+EHqWAbN7HD8RF/oCxAud4KMDGrYANsg4jpOSSU+0/BPb/jmczaSg0YMriM3UVqKspo0RjoJOeQSDWOsozTlOeGQHPvEjDLkLSXRc4o89FjjFwwfM2DXkMybEQ3CNJIlPJzjoHfS7f5PvUkSGEx3CSUK/siWOjgc8S7tn9M3d5kP6Zihre5W1YCHgiWKgZTgju8KZijw3DO5A2g4vS5rRMvBu0GdYVHJuKmqYNzJenuhDZWcY49oGlqjXGnJarXiVjTKCjuuoKQFHTjIH5pGaMxOjtcGbUNmcG3ecMgLppzXODM6Coac7AGsDfRCRU5TnWX+RXd3ljH1qtCggaXpQ3MOnvHG8A3M9NagABL53UwPLA/dtTmj0drgUA4lSkNRclTq64y8QBeB+cSRwQ7ZmKmv4xGFYDboU4Th6g5qavqDJfljhH1AMyW+fnU5DhiBAvVL9oE6gjOndzxtdeiEV6h+OYpxLwPP4HFTzByFz5kuEZYc88oaqDFIvsZScLhToiHlfSookeQ2g99flhx8lt2eYFNzgVbhg15gaYZL5iqjirpBHtMifMzcRuOwpDMIns3GZiHgSp7WDRhRN+BDPN26gsD8t2bzvjRzeQuZicqSvhB4qa5gxMXG6SM1UbzUVJk4cYt0Qaty7SmIqaPrp4qz9hmqRBLZPGhatX50hjpvqOeSrv3FQfKGr6eB9c4aIk6ClwDH4t1bcJkzKLcmlPfYgh/7wQNpf/vn976C7DkHFIoCqYG1eArbGjZ/3Tvtu4SooBZvQNFeeWoYGipilWVcH5kFxzwaM3eomVOuzZVWo5ppdzFR/UFpqj1mmfQFwltQAjBmdSy4z5gKKmqQWrcrcR85nH1hwX0uaiQV//iJKct5Rrmd/LPwLpGIfsurYn6zgOSevhbaHbW10+eWfCbvVKe3Berhn0lPrLi2wG9RIaVgtVsddKiNfhAjsyjgehMWRzFZTPYLNs7j85zry2/3Dbefwf</diagram></mxfile>

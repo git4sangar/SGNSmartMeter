@@ -259,6 +259,8 @@ in_addr_t Utils::getIpv4BroadcastIpOfEthIF() {
 int Utils::prepareRecvSock(int iPort) {
 	int sockfd, optval;
 	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+
+	optval = 1;
 	setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (const void *)&optval , sizeof(int));
 
 	//  Prepare UDP
