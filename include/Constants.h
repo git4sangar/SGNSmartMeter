@@ -28,7 +28,7 @@
 #include "JsonException.h"
 #include "Utils.h"
 
-#define JABBER_CLIENT_VERSION		(2)
+#define JABBER_CLIENT_VERSION		(3)
 
 #define ENCRYPT_KEY     "01234567890123456789012345678901"
 #define ENCRYPT_SALT    "0123456789012345"
