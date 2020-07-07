@@ -28,7 +28,13 @@
 #include "JsonException.h"
 #include "Utils.h"
 
-#define JABBER_CLIENT_VERSION		(3)
+#define JABBER_CLIENT_VERSION		(4)
+
+#define	LOG_UPLOAD_URL_STAG	"http://ec2-3-135-62-120.us-east-2.compute.amazonaws.com:3000/api/logupload"
+#define	ADD_PANEL_URL_STAG	"http://ec2-3-135-62-120.us-east-2.compute.amazonaws.com:3000/api/panels"
+
+#define	LOG_UPLOAD_URL_PROD	"https://brmacrpoc.barcindia.in:8443/api/logupload"
+#define	ADD_PANEL_URL_PROD	"https://brmacrpoc.barcindia.in:8443/api/panels"
 
 #define ENCRYPT_KEY     "01234567890123456789012345678901"
 #define ENCRYPT_SALT    "0123456789012345"
@@ -62,6 +68,8 @@
 #define MAX_LOG_SIZE			ONE_MB
 #define MODULE_NAME				"JabberClient"
 #define WDOG_PROC_NAME			"WatchDog"
+#define ENVIRONMENT_PRODUCTION		"prod"
+#define ENVIRONMENT_STAGING		"stag"
 
 class XmppDetails {
     std::string client_jid,
@@ -96,6 +104,7 @@ public:
     void parseFromJsonFactory(JsonFactory jsRoot);
 };
 
+enum Environment { STAGING, PRODUCTION };
 class Config {
     Config();
     unsigned char *encrypt_key;     // 256 bit key
@@ -105,6 +114,7 @@ class Config {
     std::vector<Version> curVersions;
     XmppDetails xmpp_details;
     Logger &info_log;
+    Environment env;
 
 public:
     virtual ~Config();
@@ -116,7 +126,10 @@ public:
     int getVerForProc(std::string strProcName);
 
     void setRPiUniqId(std::string _rpi_uniqId) { rpi_uniqId = _rpi_uniqId;}
+    void setEnv(std::string strEnv);
     std::string getRPiUniqId() {return rpi_uniqId;}
+    std::string getLogUploadURL();
+    std::string getPanelAPIURL();
 
     XmppDetails getXmppDetails() { return xmpp_details;}
     std::vector<Version> getCurrentVersions() { return curVersions; }

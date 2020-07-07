@@ -18,8 +18,6 @@
 #include <curl/curl.h>
 #include "FileLogger.h"
 
-#define	LOG_UPLOAD_URL	"http://ec2-3-135-62-120.us-east-2.compute.amazonaws.com:3000/api/logupload"
-
 #define	HTTP_REQ_TYPE_DWLD	(1)
 #define	HTTP_REQ_TYPE_UPLD	(2)
 #define HTTP_REQ_TYPE_GET	(3)

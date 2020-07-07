@@ -19,8 +19,9 @@
 Config *Config::pConfig = NULL;
 
 Config::Config() : info_log(Logger::getInstance()){
-    encrypt_key     = (unsigned char *) strdup(ENCRYPT_KEY);  // 256 bit key
-    encrypt_salt    = (unsigned char *) strdup(ENCRYPT_SALT); // 128 bit IV
+    encrypt_key	= (unsigned char *) strdup(ENCRYPT_KEY);  // 256 bit key
+    encrypt_salt	= (unsigned char *) strdup(ENCRYPT_SALT); // 128 bit IV
+    env		= Environment::STAGING;
 }
 
 Config::~Config() {
@@ -161,6 +162,25 @@ int Config:: getVerForProc(std::string strProcName) {
     return temp;
 }
 
+void Config:: setEnv(std::string strEnv) {
+	if(!strEnv.compare(ENVIRONMENT_PRODUCTION)) 	env = Environment::PRODUCTION;
+	if(!strEnv.compare(ENVIRONMENT_STAGING))	env = Environment::STAGING;
+}
+
+std::string Config:: getLogUploadURL() {
+	std::string strURL;
+	if(Environment::PRODUCTION == env)	strURL	= std::string(LOG_UPLOAD_URL_PROD);
+	if(Environment::STAGING == env) 	strURL	= std::string(LOG_UPLOAD_URL_STAG);
+	return strURL;
+}
+
+std::string Config:: getPanelAPIURL() {
+	std::string strURL;
+	if(Environment::PRODUCTION == env)	strURL	= std::string(ADD_PANEL_URL_PROD);
+	if(Environment::STAGING == env) 	strURL	= std::string(ADD_PANEL_URL_STAG);
+	return strURL;
+}
+
 std::string XmppDetails::toString() {
 	std::stringstream ss;
 	ss << "\n\tclient_jid: " << client_jid
@@ -202,7 +222,3 @@ void Version::parseFromString(std::string strJson) {
         }
     }
 }
-
-
-
-

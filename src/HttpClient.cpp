@@ -90,7 +90,7 @@ void HttpClient::uploadLogs(int cmdNo, std::string fileName, std::string strLogD
 
 	HttpReqPkt *pRqPkt	= new HttpReqPkt();
 	pRqPkt->setReqType(HTTP_REQ_TYPE_UPLD);
-	pRqPkt->setUrl(LOG_UPLOAD_URL);
+	pRqPkt->setUrl(Config::getInstance()->getLogUploadURL());
 	std::string strFile	= std::string(TECHNO_SPURS_ROOT_PATH) + fileName +
 							Utils::getYYYYMMDD_HHMMSS();
 	pRqPkt->setTgtFile(strFile);

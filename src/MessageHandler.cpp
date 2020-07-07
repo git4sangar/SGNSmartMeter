@@ -392,7 +392,7 @@ void *wdogRespThread(void *pUserData) {
 				jsPanel.addStringValue("panel_jid_password", Config::getInstance()->getXmppDetails().getClientPwd());
 				jsPanel.addStringValue("panel_session", " ");
 				jsPanel.addStringValue("panel_status", " ");
-				HttpClient::getInstance()->postReq(ADD_PANEL_URL, jsPanel.getJsonString());
+				HttpClient::getInstance()->postReq(Config::getInstance()->getPanelAPIURL(), jsPanel.getJsonString());
 				break;
 			}
 		} catch(JsonException &je) { log << "Json Exception" << std::endl;}

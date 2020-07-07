@@ -18,14 +18,20 @@
 #include "FileHandler.h"
 #include "FileLogger.h"
 
-int main() {
+int main(int argc, char *argv[]) {
 	Logger &info_log = Logger::getInstance(); sleep(1);
 	info_log << "Main: Starting Application version " << JABBER_CLIENT_VERSION << std::endl;
+
+	if(argc != 2) {
+		info_log << "Usage JabberClient prod or stag" << std::endl;
+		return 0;
+	}
 
 	//	Sleep for 2 mins so that all python process get up & would've sent a heart beat req
 	sleep(WAIT_TIME_SECs);
 
 	Config *pConfig	= Config::getInstance(); sleep(1);
+	pConfig->setEnv(std::string(argv[1]));
 	if(!pConfig->parseXmppDetails()) {
 		info_log << "Main: Error: Could not parse xmpp details" << std::endl;
 		return 0;
