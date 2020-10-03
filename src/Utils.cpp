@@ -325,6 +325,17 @@ std::string Utils::getYYYYMMDD_HHMMSS() {
 	return std::string(suffix);
 }
 
+std::string Utils::getYYYYMMDD_HH() {
+	time_t now;
+	time(&now);
+	char suffix[32];
+	struct tm *local	= localtime(&now);
+	sprintf(suffix, "%04d%02d%02d_%02d",
+			local->tm_year+1900, local->tm_mon+1, local->tm_mday,
+			local->tm_hour);
+	return std::string(suffix);
+}
+
 std::string Utils::getDotFormattedIp(in_addr_t ip) {
     char szAddr[INET_ADDRSTRLEN];
     struct in_addr ipAddr;

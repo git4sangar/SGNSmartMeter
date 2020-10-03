@@ -28,7 +28,7 @@
 #include "JsonException.h"
 #include "Utils.h"
 
-#define JABBER_CLIENT_VERSION		(4)
+#define JABBER_CLIENT_VERSION		(6)
 
 #define	LOG_UPLOAD_URL_STAG	"http://ec2-3-135-62-120.us-east-2.compute.amazonaws.com:3000/api/logupload"
 #define	ADD_PANEL_URL_STAG	"http://ec2-3-135-62-120.us-east-2.compute.amazonaws.com:3000/api/panels"
@@ -55,6 +55,7 @@
 #define TECHNO_SPURS_DOWNLOAD_FOLDER	"Downloads"
 #define TECHNO_SPURS_TEMP_DWLD_PATH	"Downloads/SmartMeter"
 #define TECHNO_SPURS_APP_FOLDER		"SmartMeter"
+#define TECHNO_SPURS_LOG_FOLDER		"Logs"
 #define TECHNO_SPURS_JABBER_LOG		"Logs/jabber_logs_"
 #define TECHNO_SPURS_WDOG_LOG		"Logs/wdog_logs_"
 #define TECHNO_SPURS_JABBER_FOLDER	"JabberClient"

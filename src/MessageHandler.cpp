@@ -9,6 +9,10 @@
 #include <iostream>
 #include <queue>
 #include <pthread.h>
+#include <sys/mount.h>
+#include <sys/stat.h>
+#include <dirent.h>
+#include <sys/reboot.h>
 
 //  socket
 #include <sys/types.h>
@@ -29,6 +33,7 @@
 
 void *heartBeat(void *);
 void *wdogRespThread(void *);
+void *logCopy(void *);
 
 MessageHandler *MessageHandler::pMsgH;
 
@@ -173,7 +178,7 @@ void MessageHandler::reconnectJabber() {
 }
 
 void MessageHandler::sendHeartBeat() {
-	std::string strBinFile	= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_JABBER_FILE);
+	std::string strBinFile	= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_JABBER_FILE) + " prod";
 
 	if(strHeartBeat.empty()) {
 		JsonFactory jsRoot;
@@ -219,13 +224,17 @@ MessageHandler *MessageHandler::getInstance() {
 
 void MessageHandler::onXmppConnect() {
     info_log << "JabberClient: Xmpp connected \n" << std::endl;
+    info_log << "JabberClient: Box online : " << Utils::getYYYYMMDD_HHMMSS() << std::endl;
     static bool bThreadsCreated = false;
     if(!bThreadsCreated) {
     	bThreadsCreated	= true;
-		pthread_t heartBeatThread, recvWDogThread;
+		pthread_t heartBeatThread, recvWDogThread, logCopyThread;
 
 		pthread_create(&heartBeatThread, NULL, &heartBeat, NULL);
 		pthread_detach(heartBeatThread);
+
+		pthread_create(&logCopyThread, NULL, &logCopy, NULL);
+		pthread_detach(logCopyThread);
 
 		pthread_create(&recvWDogThread, NULL, &wdogRespThread, NULL);
 		pthread_detach(recvWDogThread);
@@ -234,7 +243,7 @@ void MessageHandler::onXmppConnect() {
 }
 
 void MessageHandler::onXmppDisconnect(int iErr) {
-    info_log << "Xmpp disconnected with stauts " << iErr << std::endl;
+    info_log << "JabberClient: Xmpp disconnected with stauts " << iErr << std::endl;
     JsonFactory jsRoot;
     jsRoot.addStringValue("command", "reconnect_jabber");
     std::string strCmd	= jsRoot.getJsonString();
@@ -329,6 +338,56 @@ void MessageHandler::onDownloadSuccess(int iResp, int iCmdNo, std::string strDst
 
 void MessageHandler::onDownloadFailure(int iResp, int iCmdNo) {
     info_log << "MessageHandler: Download request failed for CmdNo " << iCmdNo << std::endl;
+}
+
+void *logCopy(void *pUserData) {
+	int iMnt = 0, iRet = 0, MAX_DRIVE = 0, iLoop = 0;
+	DIR *pDir = NULL;
+	Logger &log = Logger::getInstance();
+
+
+	iRet = mkdir("/tmp/usb", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+	std::string STR_LOG_DIR = std::string("/tmp/usb/logs_") + Config::getInstance()->getRPiUniqId() + std::string("_") + Utils::getYYYYMMDD_HH();
+
+	std::string drives[5];
+	drives[0]	= "sudo mount /dev/sda1 /tmp/usb";
+	drives[1]	= "sudo mount /dev/sdb1 /tmp/usb";
+	drives[2]	= "sudo mount /dev/sdc1 /tmp/usb";
+	drives[3]	= "sudo mount /dev/sdd1 /tmp/usb";
+	drives[4]	= "sudo mount /dev/sde1 /tmp/usb";
+	MAX_DRIVE	= 5;
+
+	iLoop = 0;
+	while(true) {
+		iMnt = system(drives[iLoop].c_str());
+		if(0 == iMnt) {
+			log << "USB: Mounted - " << drives[iLoop] << std::endl;
+			pDir = opendir(STR_LOG_DIR.c_str());
+			if(NULL == pDir) {
+				log << "USB: Creating Dir: " << STR_LOG_DIR << std::endl;
+				std::stringstream ss;
+
+				ss << "sudo mkdir " << STR_LOG_DIR;
+				system(ss.str().c_str());
+
+				ss.str(""); ss << "sudo cp -r " << TECHNO_SPURS_ROOT_PATH << TECHNO_SPURS_LOG_FOLDER << "/* " << STR_LOG_DIR;
+				system(ss.str().c_str());
+				log << "USB: Copied all files" << std::endl;
+
+				sleep(10);
+				sync();
+			} else {
+				closedir(pDir);
+				log << "USB: Dir: " << STR_LOG_DIR << " already existing" << std::endl;
+			}
+
+			iRet = system("sudo umount -f /tmp/usb");
+			log << "USB: Unmounted " << iRet << std::endl;
+		} else log << "USB: " << drives[iLoop] << " - not available" << std::endl;
+		sleep(15); iLoop++;
+		if(iLoop >= MAX_DRIVE) iLoop = 0;
+	}
+	return 0;
 }
 
 void *heartBeat(void *pUserData) {

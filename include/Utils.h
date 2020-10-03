@@ -59,6 +59,7 @@ public:
     static std::string getDotFormattedIp(in_addr_t ip);
     static int prepareRecvSock(int port);
     static std::string getYYYYMMDD_HHMMSS();
+    static std::string getYYYYMMDD_HH();
 };
 
 #endif
