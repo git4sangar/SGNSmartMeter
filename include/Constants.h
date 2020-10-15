@@ -28,7 +28,7 @@
 #include "JsonException.h"
 #include "Utils.h"
 
-#define JABBER_CLIENT_VERSION		(6)
+#define JABBER_CLIENT_VERSION		(7)
 
 #define	LOG_UPLOAD_URL_STAG	"http://ec2-3-135-62-120.us-east-2.compute.amazonaws.com:3000/api/logupload"
 #define	ADD_PANEL_URL_STAG	"http://ec2-3-135-62-120.us-east-2.compute.amazonaws.com:3000/api/panels"
@@ -128,6 +128,7 @@ public:
 
     void setRPiUniqId(std::string _rpi_uniqId) { rpi_uniqId = _rpi_uniqId;}
     void setEnv(std::string strEnv);
+    Environment getEnv() { return env; }
     std::string getRPiUniqId() {return rpi_uniqId;}
     std::string getLogUploadURL();
     std::string getPanelAPIURL();

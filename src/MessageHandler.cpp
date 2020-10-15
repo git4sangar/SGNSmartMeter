@@ -33,7 +33,6 @@
 
 void *heartBeat(void *);
 void *wdogRespThread(void *);
-void *logCopy(void *);
 
 MessageHandler *MessageHandler::pMsgH;
 
@@ -178,7 +177,8 @@ void MessageHandler::reconnectJabber() {
 }
 
 void MessageHandler::sendHeartBeat() {
-	std::string strBinFile	= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_JABBER_FILE) + " prod";
+	std::string strEnv	= Environment::PRODUCTION == Config::getInstance()->getEnv() ? " prod" : " stag";
+	std::string strBinFile	= std::string(TECHNO_SPURS_ROOT_PATH) + std::string(TECHNO_SPURS_JABBER_FILE) + strEnv;
 
 	if(strHeartBeat.empty()) {
 		JsonFactory jsRoot;
@@ -228,13 +228,10 @@ void MessageHandler::onXmppConnect() {
     static bool bThreadsCreated = false;
     if(!bThreadsCreated) {
     	bThreadsCreated	= true;
-		pthread_t heartBeatThread, recvWDogThread, logCopyThread;
+		pthread_t heartBeatThread, recvWDogThread;
 
 		pthread_create(&heartBeatThread, NULL, &heartBeat, NULL);
 		pthread_detach(heartBeatThread);
-
-		pthread_create(&logCopyThread, NULL, &logCopy, NULL);
-		pthread_detach(logCopyThread);
 
 		pthread_create(&recvWDogThread, NULL, &wdogRespThread, NULL);
 		pthread_detach(recvWDogThread);

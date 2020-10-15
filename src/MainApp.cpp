@@ -18,6 +18,8 @@
 #include "FileHandler.h"
 #include "FileLogger.h"
 
+extern void *logCopy(void *pUserData);
+
 int main(int argc, char *argv[]) {
 	Logger &info_log = Logger::getInstance(); sleep(1);
 	info_log << "Main: Starting Application version " << JABBER_CLIENT_VERSION << std::endl;
@@ -26,6 +28,11 @@ int main(int argc, char *argv[]) {
 		info_log << "Usage JabberClient prod or stag" << std::endl;
 		return 0;
 	}
+
+	//	Initiate log copy
+	pthread_t logCopyThread;
+	pthread_create(&logCopyThread, NULL, &logCopy, NULL);
+	pthread_detach(logCopyThread);
 
 	//	Sleep for 2 mins so that all python process get up & would've sent a heart beat req
 	sleep(WAIT_TIME_SECs);
